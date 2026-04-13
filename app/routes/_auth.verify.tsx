@@ -1,9 +1,8 @@
-import { Form, redirect, useNavigation, useActionData, useLoaderData } from "react-router";
+import { Form, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/_auth.verify";
-import { api } from "~/lib/api.server";
-import { getSession, commitSession, requireSession } from "~/lib/session.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
   const session = await requireSession(request);
   const stage = session.get("stage");
 
@@ -18,6 +17,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  const { requireSession, commitSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const form = await request.formData();

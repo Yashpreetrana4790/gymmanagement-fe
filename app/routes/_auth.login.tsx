@@ -1,14 +1,15 @@
-import { Form, Link, redirect, useNavigation, useActionData } from "react-router";
+import { Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/_auth.login";
-import { api } from "~/lib/api.server";
-import { getSession, commitSession, redirectIfAuthenticated } from "~/lib/session.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { redirectIfAuthenticated } = await import("~/lib/session.server");
   await redirectIfAuthenticated(request);
   return null;
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  const { getSession, commitSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const form = await request.formData();
   const email = form.get("email") as string;
   const password = form.get("password") as string;

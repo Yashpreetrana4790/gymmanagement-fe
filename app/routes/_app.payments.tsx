@@ -1,5 +1,4 @@
 import type { Route } from "./+types/_app.payments";
-import { requireSession } from "~/lib/session.server";
 
 type Payment = {
   _id: string;
@@ -11,6 +10,7 @@ type Payment = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
   await requireSession(request);
   // Placeholder — payments endpoint to be built
   return { payments: [] as Payment[], summary: { totalCollected: 0, pending: 0, overdue: 0 } };

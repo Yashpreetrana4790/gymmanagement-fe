@@ -1,5 +1,4 @@
 import type { Route } from "./+types/_app.staff";
-import { requireSession } from "~/lib/session.server";
 
 type StaffMember = {
   _id: string;
@@ -13,6 +12,7 @@ type StaffMember = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
   await requireSession(request);
   return { staff: [] as StaffMember[] };
 }

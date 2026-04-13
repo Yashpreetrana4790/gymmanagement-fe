@@ -1,7 +1,5 @@
 import { Form, useNavigation, Link } from "react-router";
 import type { Route } from "./+types/_app.plans";
-import { api } from "~/lib/api.server";
-import { requireSession } from "~/lib/session.server";
 
 type Plan = {
   _id: string;
@@ -14,6 +12,8 @@ type Plan = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const result = await api.get<{ data: Plan[] }>("/api/plans", token);
@@ -21,6 +21,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const form = await request.formData();

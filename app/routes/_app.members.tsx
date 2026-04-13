@@ -1,8 +1,6 @@
 import { Form, useNavigation } from "react-router";
 import { useState, useEffect } from "react";
 import type { Route } from "./+types/_app.members";
-import { api } from "~/lib/api.server";
-import { requireSession } from "~/lib/session.server";
 
 type Member = {
   _id: string;
@@ -15,6 +13,8 @@ type Member = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const result = await api.get<{ data: Member[]; count: number }>("/api/members", token);
@@ -22,6 +22,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const form = await request.formData();

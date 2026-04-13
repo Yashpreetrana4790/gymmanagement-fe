@@ -1,9 +1,9 @@
 import { Link, NavLink, Outlet, redirect, Form } from "react-router";
 import type { Route } from "./+types/_app";
-import { api } from "~/lib/api.server";
-import { requireSession, destroySession, getSession } from "~/lib/session.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const stage = session.get("stage");
 
@@ -22,6 +22,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  const { getSession, destroySession } = await import("~/lib/session.server");
   const session = await getSession(request);
   return redirect("/login", {
     headers: { "Set-Cookie": await destroySession(session) },

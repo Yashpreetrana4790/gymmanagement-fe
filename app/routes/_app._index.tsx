@@ -1,7 +1,5 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/_app._index";
-import { api } from "~/lib/api.server";
-import { requireSession } from "~/lib/session.server";
 
 type MemberDoc = {
   _id: string;
@@ -12,6 +10,8 @@ type MemberDoc = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { requireSession } = await import("~/lib/session.server");
+  const { api } = await import("~/lib/api.server");
   const session = await requireSession(request);
   const token = session.get("token")!;
   const firstName = session.get("firstName") ?? "there";
