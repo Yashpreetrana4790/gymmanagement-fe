@@ -1,4 +1,4 @@
-import { jsx, jsxs } from "react/jsx-runtime";
+import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter, UNSAFE_withComponentProps, Outlet, UNSAFE_withErrorBoundaryProps, Meta, Links, ScrollRestoration, Scripts, useNavigation, Form, Link, redirect, NavLink } from "react-router";
@@ -112,67 +112,124 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 }, Symbol.toStringTag, { value: "Module" }));
 const _auth = UNSAFE_withComponentProps(function AuthLayout() {
   return /* @__PURE__ */ jsxs("div", {
-    className: "min-h-screen flex",
+    className: "min-h-screen flex bg-gray-950",
     children: [/* @__PURE__ */ jsxs("div", {
-      className: "hidden lg:flex lg:w-1/2 bg-slate-900 flex-col justify-between p-12",
-      children: [/* @__PURE__ */ jsxs("div", {
-        className: "flex items-center gap-3",
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center",
-          children: /* @__PURE__ */ jsx("svg", {
-            className: "w-6 h-6 text-white",
-            fill: "none",
-            viewBox: "0 0 24 24",
-            stroke: "currentColor",
-            children: /* @__PURE__ */ jsx("path", {
-              strokeLinecap: "round",
-              strokeLinejoin: "round",
-              strokeWidth: 2,
-              d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            })
-          })
-        }), /* @__PURE__ */ jsx("span", {
-          className: "text-white font-bold text-xl tracking-tight",
-          children: "GymManager"
-        })]
+      className: "hidden lg:flex lg:w-[58%] relative overflow-hidden",
+      children: [/* @__PURE__ */ jsx("img", {
+        src: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1920&q=80",
+        alt: "",
+        className: "absolute inset-0 w-full h-full object-cover scale-105"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute inset-0 bg-linear-to-r from-black/95 via-black/75 to-black/40"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/50"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute -bottom-20 -left-20 w-120 h-120 bg-blue-600/20 rounded-full blur-3xl"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute top-10 right-0 w-75 h-75 bg-cyan-500/10 rounded-full blur-3xl"
       }), /* @__PURE__ */ jsxs("div", {
-        children: [/* @__PURE__ */ jsx("blockquote", {
-          className: "text-slate-300 text-2xl font-light leading-relaxed",
-          children: '"Manage your gym smarter. Track members, plans, and payments — all in one place."'
-        }), /* @__PURE__ */ jsx("div", {
-          className: "mt-8 flex gap-6",
-          children: [{
-            label: "Members",
-            value: "500+"
-          }, {
-            label: "Gyms",
-            value: "50+"
-          }, {
-            label: "Uptime",
-            value: "99.9%"
-          }].map((stat) => /* @__PURE__ */ jsxs("div", {
-            children: [/* @__PURE__ */ jsx("p", {
-              className: "text-white text-2xl font-bold",
-              children: stat.value
-            }), /* @__PURE__ */ jsx("p", {
-              className: "text-slate-400 text-sm",
-              children: stat.label
-            })]
-          }, stat.label))
-        })]
-      }), /* @__PURE__ */ jsxs("p", {
-        className: "text-slate-500 text-sm",
-        suppressHydrationWarning: true,
-        children: ["© ", (/* @__PURE__ */ new Date()).getFullYear(), " GymManager. All rights reserved."]
-      })]
-    }), /* @__PURE__ */ jsx("div", {
-      className: "flex-1 flex items-center justify-center p-6 lg:p-12 bg-gray-50",
-      children: /* @__PURE__ */ jsxs("div", {
-        className: "w-full max-w-md",
+        className: "relative z-10 flex flex-col justify-between p-14 w-full",
         children: [/* @__PURE__ */ jsxs("div", {
-          className: "flex items-center gap-2 mb-8 lg:hidden",
+          className: "flex items-center gap-3",
           children: [/* @__PURE__ */ jsx("div", {
-            className: "w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center",
+            className: "w-11 h-11 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/40",
+            children: /* @__PURE__ */ jsx("svg", {
+              className: "w-6 h-6 text-white",
+              fill: "none",
+              viewBox: "0 0 24 24",
+              stroke: "currentColor",
+              children: /* @__PURE__ */ jsx("path", {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2.5,
+                d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              })
+            })
+          }), /* @__PURE__ */ jsx("span", {
+            className: "text-white font-black text-xl tracking-tight",
+            children: "GymManager"
+          })]
+        }), /* @__PURE__ */ jsxs("div", {
+          children: [/* @__PURE__ */ jsxs("div", {
+            className: "inline-flex items-center gap-2 bg-blue-500/15 border border-blue-400/25 rounded-full px-4 py-1.5 mb-8",
+            children: [/* @__PURE__ */ jsx("span", {
+              className: "w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse inline-block"
+            }), /* @__PURE__ */ jsx("span", {
+              className: "text-blue-300 text-sm font-medium",
+              children: "Trusted by 50+ gyms worldwide"
+            })]
+          }), /* @__PURE__ */ jsxs("h1", {
+            className: "text-6xl font-black text-white leading-[1.05] tracking-tight mb-5",
+            children: ["Run Your", /* @__PURE__ */ jsx("br", {}), /* @__PURE__ */ jsx("span", {
+              className: "text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-cyan-300 to-blue-300",
+              children: "Gym Empire"
+            })]
+          }), /* @__PURE__ */ jsx("p", {
+            className: "text-slate-400 text-lg leading-relaxed max-w-sm",
+            children: "Members, plans, payments — managed from one powerful dashboard built for serious gym owners."
+          }), /* @__PURE__ */ jsx("div", {
+            className: "mt-12 flex gap-4",
+            children: [{
+              value: "500+",
+              label: "Members managed"
+            }, {
+              value: "50+",
+              label: "Gyms onboarded"
+            }, {
+              value: "99.9%",
+              label: "Uptime"
+            }].map((stat) => /* @__PURE__ */ jsxs("div", {
+              className: "bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-5 py-4 flex-1",
+              children: [/* @__PURE__ */ jsx("p", {
+                className: "text-white text-2xl font-black",
+                children: stat.value
+              }), /* @__PURE__ */ jsx("p", {
+                className: "text-slate-500 text-xs mt-0.5",
+                children: stat.label
+              })]
+            }, stat.label))
+          })]
+        }), /* @__PURE__ */ jsx("div", {
+          className: "bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5",
+          children: /* @__PURE__ */ jsxs("div", {
+            className: "flex items-start gap-3",
+            children: [/* @__PURE__ */ jsx("div", {
+              className: "w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-sm font-black shrink-0",
+              children: "R"
+            }), /* @__PURE__ */ jsxs("div", {
+              children: [/* @__PURE__ */ jsx("p", {
+                className: "text-slate-300 text-sm leading-relaxed",
+                children: '"GymManager completely transformed how I run my gym. Member management is now effortless."'
+              }), /* @__PURE__ */ jsx("p", {
+                className: "text-slate-500 text-xs mt-2 font-medium",
+                children: "Rahul S. — Owner, Iron Paradise Gym"
+              })]
+            })]
+          })
+        }), /* @__PURE__ */ jsxs("p", {
+          className: "text-slate-700 text-xs",
+          suppressHydrationWarning: true,
+          children: ["© ", (/* @__PURE__ */ new Date()).getFullYear(), " GymManager. All rights reserved."]
+        })]
+      })]
+    }), /* @__PURE__ */ jsxs("div", {
+      className: "flex-1 flex items-center justify-center relative overflow-hidden",
+      children: [/* @__PURE__ */ jsx("div", {
+        className: "absolute top-0 right-0 w-150 h-150 bg-blue-600/8 rounded-full blur-3xl pointer-events-none"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute bottom-0 left-0 w-100 h-100 bg-cyan-500/6 rounded-full blur-3xl pointer-events-none"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute inset-0 opacity-[0.03] pointer-events-none",
+        style: {
+          backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
+          backgroundSize: "40px 40px"
+        }
+      }), /* @__PURE__ */ jsxs("div", {
+        className: "relative z-10 w-full max-w-md px-6 py-10",
+        children: [/* @__PURE__ */ jsxs("div", {
+          className: "flex items-center gap-2.5 mb-10 lg:hidden",
+          children: [/* @__PURE__ */ jsx("div", {
+            className: "w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/40",
             children: /* @__PURE__ */ jsx("svg", {
               className: "w-5 h-5 text-white",
               fill: "none",
@@ -181,16 +238,19 @@ const _auth = UNSAFE_withComponentProps(function AuthLayout() {
               children: /* @__PURE__ */ jsx("path", {
                 strokeLinecap: "round",
                 strokeLinejoin: "round",
-                strokeWidth: 2,
+                strokeWidth: 2.5,
                 d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               })
             })
           }), /* @__PURE__ */ jsx("span", {
-            className: "font-bold text-lg",
+            className: "font-black text-lg text-white tracking-tight",
             children: "GymManager"
           })]
-        }), /* @__PURE__ */ jsx(Outlet, {})]
-      })
+        }), /* @__PURE__ */ jsx("div", {
+          className: "bg-white/4 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/50",
+          children: /* @__PURE__ */ jsx(Outlet, {})
+        })]
+      })]
     })]
   });
 });
@@ -259,6 +319,7 @@ async function action$6({
     }
   });
 }
+const inputCls$2 = "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/40 transition";
 const _auth_signup = UNSAFE_withComponentProps(function Signup({
   actionData
 }) {
@@ -267,117 +328,148 @@ const _auth_signup = UNSAFE_withComponentProps(function Signup({
   return /* @__PURE__ */ jsxs("div", {
     children: [/* @__PURE__ */ jsxs("div", {
       className: "mb-8",
-      children: [/* @__PURE__ */ jsx("h1", {
-        className: "text-3xl font-bold text-gray-900",
+      children: [/* @__PURE__ */ jsx("div", {
+        className: "w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mb-5",
+        children: /* @__PURE__ */ jsx("svg", {
+          className: "w-6 h-6 text-blue-400",
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor",
+          children: /* @__PURE__ */ jsx("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+          })
+        })
+      }), /* @__PURE__ */ jsx("h1", {
+        className: "text-2xl font-black text-white tracking-tight",
         children: "Create your account"
       }), /* @__PURE__ */ jsx("p", {
-        className: "mt-2 text-gray-500",
+        className: "mt-1.5 text-slate-400 text-sm",
         children: "Start managing your gym in minutes."
       })]
-    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsx("div", {
-      className: "mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm",
-      children: actionData.error
+    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsxs("div", {
+      className: "mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2.5",
+      children: [/* @__PURE__ */ jsx("svg", {
+        className: "w-4 h-4 shrink-0",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
+        children: /* @__PURE__ */ jsx("path", {
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: 2,
+          d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        })
+      }), actionData.error]
     }), /* @__PURE__ */ jsxs(Form, {
       method: "post",
       className: "space-y-4",
       children: [/* @__PURE__ */ jsxs("div", {
-        className: "grid grid-cols-2 gap-4",
+        className: "grid grid-cols-2 gap-3",
         children: [/* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsx("label", {
-            htmlFor: "firstName",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: "First name"
           }), /* @__PURE__ */ jsx("input", {
-            id: "firstName",
             name: "firstName",
-            type: "text",
             required: true,
+            type: "text",
             autoComplete: "given-name",
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "John"
+            placeholder: "John",
+            className: inputCls$2
           })]
         }), /* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsx("label", {
-            htmlFor: "lastName",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: "Last name"
           }), /* @__PURE__ */ jsx("input", {
-            id: "lastName",
             name: "lastName",
-            type: "text",
             required: true,
+            type: "text",
             autoComplete: "family-name",
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "Doe"
+            placeholder: "Doe",
+            className: inputCls$2
           })]
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
-          htmlFor: "phone",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Phone number"
         }), /* @__PURE__ */ jsx("input", {
-          id: "phone",
           name: "phone",
-          type: "tel",
           required: true,
+          type: "tel",
           autoComplete: "tel",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "+91 98765 43210"
+          placeholder: "+91 98765 43210",
+          className: inputCls$2
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
-          htmlFor: "email",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Email address"
         }), /* @__PURE__ */ jsx("input", {
-          id: "email",
           name: "email",
-          type: "email",
           required: true,
+          type: "email",
           autoComplete: "email",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "john@yourgym.com"
+          placeholder: "john@yourgym.com",
+          className: inputCls$2
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
-          htmlFor: "password",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Password"
         }), /* @__PURE__ */ jsx("input", {
-          id: "password",
           name: "password",
-          type: "password",
           required: true,
+          type: "password",
           autoComplete: "new-password",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "Min. 6 characters"
+          placeholder: "Min. 6 characters",
+          className: inputCls$2
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
-          htmlFor: "confirmPassword",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Confirm password"
         }), /* @__PURE__ */ jsx("input", {
-          id: "confirmPassword",
           name: "confirmPassword",
-          type: "password",
           required: true,
+          type: "password",
           autoComplete: "new-password",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "Re-enter password"
+          placeholder: "Re-enter password",
+          className: inputCls$2
         })]
       }), /* @__PURE__ */ jsx("button", {
         type: "submit",
         disabled: isSubmitting,
-        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        children: isSubmitting ? "Creating account…" : "Create account"
+        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2",
+        children: isSubmitting ? /* @__PURE__ */ jsxs(Fragment, {
+          children: [/* @__PURE__ */ jsxs("svg", {
+            className: "w-4 h-4 animate-spin",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            children: [/* @__PURE__ */ jsx("circle", {
+              className: "opacity-25",
+              cx: "12",
+              cy: "12",
+              r: "10",
+              stroke: "currentColor",
+              strokeWidth: "4"
+            }), /* @__PURE__ */ jsx("path", {
+              className: "opacity-75",
+              fill: "currentColor",
+              d: "M4 12a8 8 0 018-8v8H4z"
+            })]
+          }), "Creating account…"]
+        }) : "Create account"
       })]
     }), /* @__PURE__ */ jsxs("p", {
-      className: "mt-6 text-center text-sm text-gray-500",
+      className: "mt-6 text-center text-sm text-slate-500",
       children: ["Already have an account?", " ", /* @__PURE__ */ jsx(Link, {
         to: "/login",
-        className: "font-semibold text-blue-600 hover:text-blue-700",
+        className: "font-semibold text-blue-400 hover:text-blue-300 transition",
         children: "Sign in"
       })]
     })]
@@ -441,23 +533,48 @@ const _auth_login = UNSAFE_withComponentProps(function Login({
   return /* @__PURE__ */ jsxs("div", {
     children: [/* @__PURE__ */ jsxs("div", {
       className: "mb-8",
-      children: [/* @__PURE__ */ jsx("h1", {
-        className: "text-3xl font-bold text-gray-900",
+      children: [/* @__PURE__ */ jsx("div", {
+        className: "w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mb-5",
+        children: /* @__PURE__ */ jsx("svg", {
+          className: "w-6 h-6 text-blue-400",
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor",
+          children: /* @__PURE__ */ jsx("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+          })
+        })
+      }), /* @__PURE__ */ jsx("h1", {
+        className: "text-2xl font-black text-white tracking-tight",
         children: "Welcome back"
       }), /* @__PURE__ */ jsx("p", {
-        className: "mt-2 text-gray-500",
+        className: "mt-1.5 text-slate-400 text-sm",
         children: "Sign in to your GymManager account."
       })]
-    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsx("div", {
-      className: "mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm",
-      children: actionData.error
+    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsxs("div", {
+      className: "mb-6 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2.5",
+      children: [/* @__PURE__ */ jsx("svg", {
+        className: "w-4 h-4 shrink-0",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
+        children: /* @__PURE__ */ jsx("path", {
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: 2,
+          d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        })
+      }), actionData.error]
     }), /* @__PURE__ */ jsxs(Form, {
       method: "post",
       className: "space-y-4",
       children: [/* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
           htmlFor: "email",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Email address"
         }), /* @__PURE__ */ jsx("input", {
           id: "email",
@@ -465,37 +582,52 @@ const _auth_login = UNSAFE_withComponentProps(function Login({
           type: "email",
           required: true,
           autoComplete: "email",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
+          className: "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/40 transition",
           placeholder: "john@yourgym.com"
         })]
       }), /* @__PURE__ */ jsxs("div", {
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "flex justify-between items-center mb-1.5",
-          children: /* @__PURE__ */ jsx("label", {
-            htmlFor: "password",
-            className: "block text-sm font-medium text-gray-700",
-            children: "Password"
-          })
+        children: [/* @__PURE__ */ jsx("label", {
+          htmlFor: "password",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
+          children: "Password"
         }), /* @__PURE__ */ jsx("input", {
           id: "password",
           name: "password",
           type: "password",
           required: true,
           autoComplete: "current-password",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
+          className: "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/40 transition",
           placeholder: "Enter your password"
         })]
       }), /* @__PURE__ */ jsx("button", {
         type: "submit",
         disabled: isSubmitting,
-        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        children: isSubmitting ? "Signing in…" : "Sign in"
+        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2",
+        children: isSubmitting ? /* @__PURE__ */ jsxs(Fragment, {
+          children: [/* @__PURE__ */ jsxs("svg", {
+            className: "w-4 h-4 animate-spin",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            children: [/* @__PURE__ */ jsx("circle", {
+              className: "opacity-25",
+              cx: "12",
+              cy: "12",
+              r: "10",
+              stroke: "currentColor",
+              strokeWidth: "4"
+            }), /* @__PURE__ */ jsx("path", {
+              className: "opacity-75",
+              fill: "currentColor",
+              d: "M4 12a8 8 0 018-8v8H4z"
+            })]
+          }), "Signing in…"]
+        }) : "Sign in"
       })]
     }), /* @__PURE__ */ jsxs("p", {
-      className: "mt-6 text-center text-sm text-gray-500",
+      className: "mt-6 text-center text-sm text-slate-500",
       children: ["Don't have an account?", " ", /* @__PURE__ */ jsx(Link, {
         to: "/signup",
-        className: "font-semibold text-blue-600 hover:text-blue-700",
+        className: "font-semibold text-blue-400 hover:text-blue-300 transition",
         children: "Create one free"
       })]
     })]
@@ -579,9 +711,9 @@ const _auth_verify = UNSAFE_withComponentProps(function Verify({
     children: [/* @__PURE__ */ jsxs("div", {
       className: "mb-8",
       children: [/* @__PURE__ */ jsx("div", {
-        className: "w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6",
+        className: "w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mb-5",
         children: /* @__PURE__ */ jsx("svg", {
-          className: "w-7 h-7 text-blue-600",
+          className: "w-6 h-6 text-blue-400",
           fill: "none",
           viewBox: "0 0 24 24",
           stroke: "currentColor",
@@ -593,28 +725,39 @@ const _auth_verify = UNSAFE_withComponentProps(function Verify({
           })
         })
       }), /* @__PURE__ */ jsx("h1", {
-        className: "text-3xl font-bold text-gray-900",
+        className: "text-2xl font-black text-white tracking-tight",
         children: "Check your email"
       }), /* @__PURE__ */ jsxs("p", {
-        className: "mt-2 text-gray-500",
+        className: "mt-1.5 text-slate-400 text-sm",
         children: ["Hi ", firstName, "! We sent a 6-digit code to", " ", /* @__PURE__ */ jsx("span", {
-          className: "font-medium text-gray-700",
+          className: "text-slate-300 font-medium",
           children: email
-        }), ". Enter it below to verify your account."]
+        }), "."]
       })]
     }), (actionData == null ? void 0 : actionData.resent) && /* @__PURE__ */ jsx("div", {
-      className: "mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm",
+      className: "mb-5 p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm",
       children: "A new code has been sent to your email."
-    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsx("div", {
-      className: "mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm",
-      children: actionData.error
+    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsxs("div", {
+      className: "mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2.5",
+      children: [/* @__PURE__ */ jsx("svg", {
+        className: "w-4 h-4 shrink-0",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
+        children: /* @__PURE__ */ jsx("path", {
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: 2,
+          d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        })
+      }), actionData.error]
     }), /* @__PURE__ */ jsxs(Form, {
       method: "post",
       className: "space-y-4",
       children: [/* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
           htmlFor: "code",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Verification code"
         }), /* @__PURE__ */ jsx("input", {
           id: "code",
@@ -625,19 +768,37 @@ const _auth_verify = UNSAFE_withComponentProps(function Verify({
           autoComplete: "one-time-code",
           inputMode: "numeric",
           pattern: "[0-9]{6}",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 text-center text-2xl tracking-[0.5em] font-mono placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
+          className: "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/40 transition",
           placeholder: "000000"
         })]
       }), /* @__PURE__ */ jsx("button", {
         type: "submit",
         disabled: isSubmitting,
-        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        children: isSubmitting ? "Verifying…" : "Verify account"
+        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2",
+        children: isSubmitting ? /* @__PURE__ */ jsxs(Fragment, {
+          children: [/* @__PURE__ */ jsxs("svg", {
+            className: "w-4 h-4 animate-spin",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            children: [/* @__PURE__ */ jsx("circle", {
+              className: "opacity-25",
+              cx: "12",
+              cy: "12",
+              r: "10",
+              stroke: "currentColor",
+              strokeWidth: "4"
+            }), /* @__PURE__ */ jsx("path", {
+              className: "opacity-75",
+              fill: "currentColor",
+              d: "M4 12a8 8 0 018-8v8H4z"
+            })]
+          }), "Verifying…"]
+        }) : "Verify account"
       })]
     }), /* @__PURE__ */ jsx("div", {
       className: "mt-6 text-center",
       children: /* @__PURE__ */ jsxs("p", {
-        className: "text-sm text-gray-500",
+        className: "text-sm text-slate-500",
         children: ["Didn't receive the code?", " ", /* @__PURE__ */ jsxs(Form, {
           method: "post",
           className: "inline",
@@ -647,8 +808,8 @@ const _auth_verify = UNSAFE_withComponentProps(function Verify({
             value: "resend"
           }), /* @__PURE__ */ jsx("button", {
             type: "submit",
-            className: "font-semibold text-blue-600 hover:text-blue-700 disabled:opacity-50",
             disabled: isSubmitting,
+            className: "font-semibold text-blue-400 hover:text-blue-300 disabled:opacity-50 transition",
             children: "Resend code"
           })]
         })]
@@ -711,6 +872,7 @@ async function action$3({
     }
   });
 }
+const inputCls$1 = "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/40 transition";
 const _auth_onboarding = UNSAFE_withComponentProps(function Onboarding({
   loaderData,
   actionData
@@ -724,9 +886,9 @@ const _auth_onboarding = UNSAFE_withComponentProps(function Onboarding({
     children: [/* @__PURE__ */ jsxs("div", {
       className: "mb-8",
       children: [/* @__PURE__ */ jsx("div", {
-        className: "w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6",
+        className: "w-12 h-12 bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-center mb-5",
         children: /* @__PURE__ */ jsx("svg", {
-          className: "w-7 h-7 text-amber-500",
+          className: "w-6 h-6 text-amber-400",
           fill: "none",
           viewBox: "0 0 24 24",
           stroke: "currentColor",
@@ -738,126 +900,141 @@ const _auth_onboarding = UNSAFE_withComponentProps(function Onboarding({
           })
         })
       }), /* @__PURE__ */ jsx("h1", {
-        className: "text-3xl font-bold text-gray-900",
+        className: "text-2xl font-black text-white tracking-tight",
         children: "Set up your gym"
       }), /* @__PURE__ */ jsxs("p", {
-        className: "mt-2 text-gray-500",
-        children: ["Great work, ", firstName, "! Just a few details about your gym to get started."]
+        className: "mt-1.5 text-slate-400 text-sm",
+        children: ["Great work, ", firstName, "! A few details about your gym to get started."]
       })]
-    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsx("div", {
-      className: "mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm",
-      children: actionData.error
+    }), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ jsxs("div", {
+      className: "mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2.5",
+      children: [/* @__PURE__ */ jsx("svg", {
+        className: "w-4 h-4 shrink-0",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
+        children: /* @__PURE__ */ jsx("path", {
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: 2,
+          d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        })
+      }), actionData.error]
     }), /* @__PURE__ */ jsxs(Form, {
       method: "post",
       className: "space-y-4",
       children: [/* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsxs("label", {
-          htmlFor: "gymName",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: ["Gym name ", /* @__PURE__ */ jsx("span", {
-            className: "text-red-500",
+            className: "text-red-400",
             children: "*"
           })]
         }), /* @__PURE__ */ jsx("input", {
-          id: "gymName",
           name: "gymName",
-          type: "text",
           required: true,
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "e.g. Iron Paradise Gym"
+          type: "text",
+          placeholder: "e.g. Iron Paradise Gym",
+          className: inputCls$1
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsxs("label", {
-          htmlFor: "strength",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: ["Gym capacity (members) ", /* @__PURE__ */ jsx("span", {
-            className: "text-red-500",
+            className: "text-red-400",
             children: "*"
           })]
         }), /* @__PURE__ */ jsx("input", {
-          id: "strength",
           name: "strength",
-          type: "number",
           required: true,
+          type: "number",
           min: 1,
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "e.g. 200"
+          placeholder: "e.g. 200",
+          className: inputCls$1
         })]
       }), /* @__PURE__ */ jsxs("div", {
-        className: "grid grid-cols-2 gap-4",
+        className: "grid grid-cols-2 gap-3",
         children: [/* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsxs("label", {
-            htmlFor: "city",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: ["City ", /* @__PURE__ */ jsx("span", {
-              className: "text-red-500",
+              className: "text-red-400",
               children: "*"
             })]
           }), /* @__PURE__ */ jsx("input", {
-            id: "city",
             name: "city",
-            type: "text",
             required: true,
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "Mumbai"
+            type: "text",
+            placeholder: "Mumbai",
+            className: inputCls$1
           })]
         }), /* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsx("label", {
-            htmlFor: "state",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: "State"
           }), /* @__PURE__ */ jsx("input", {
-            id: "state",
             name: "state",
             type: "text",
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "Maharashtra"
+            placeholder: "Maharashtra",
+            className: inputCls$1
           })]
         })]
       }), /* @__PURE__ */ jsxs("div", {
         children: [/* @__PURE__ */ jsx("label", {
-          htmlFor: "address",
-          className: "block text-sm font-medium text-gray-700 mb-1.5",
+          className: "block text-sm font-medium text-slate-300 mb-1.5",
           children: "Full address"
         }), /* @__PURE__ */ jsx("input", {
-          id: "address",
           name: "address",
           type: "text",
-          className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-          placeholder: "123, Main Street, Andheri West"
+          placeholder: "123, Main Street, Andheri West",
+          className: inputCls$1
         })]
       }), /* @__PURE__ */ jsxs("div", {
-        className: "grid grid-cols-2 gap-4",
+        className: "grid grid-cols-2 gap-3",
         children: [/* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsx("label", {
-            htmlFor: "pincode",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: "Pincode"
           }), /* @__PURE__ */ jsx("input", {
-            id: "pincode",
             name: "pincode",
             type: "text",
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "400053"
+            placeholder: "400053",
+            className: inputCls$1
           })]
         }), /* @__PURE__ */ jsxs("div", {
           children: [/* @__PURE__ */ jsx("label", {
-            htmlFor: "phone",
-            className: "block text-sm font-medium text-gray-700 mb-1.5",
+            className: "block text-sm font-medium text-slate-300 mb-1.5",
             children: "Gym contact"
           }), /* @__PURE__ */ jsx("input", {
-            id: "phone",
             name: "phone",
             type: "tel",
-            className: "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
-            placeholder: "+91 98765 43210"
+            placeholder: "+91 98765 43210",
+            className: inputCls$1
           })]
         })]
       }), /* @__PURE__ */ jsx("button", {
         type: "submit",
         disabled: isSubmitting,
-        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        children: isSubmitting ? "Creating gym profile…" : "Create gym profile →"
+        className: "w-full py-3 px-4 mt-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2",
+        children: isSubmitting ? /* @__PURE__ */ jsxs(Fragment, {
+          children: [/* @__PURE__ */ jsxs("svg", {
+            className: "w-4 h-4 animate-spin",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            children: [/* @__PURE__ */ jsx("circle", {
+              className: "opacity-25",
+              cx: "12",
+              cy: "12",
+              r: "10",
+              stroke: "currentColor",
+              strokeWidth: "4"
+            }), /* @__PURE__ */ jsx("path", {
+              className: "opacity-75",
+              fill: "currentColor",
+              d: "M4 12a8 8 0 018-8v8H4z"
+            })]
+          }), "Creating gym profile…"]
+        }) : "Create gym profile →"
       })]
     })]
   });
@@ -2676,7 +2853,7 @@ const route11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   default: _app_payments,
   loader
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-bNIrH7sc.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": true, "module": "/assets/root-BJNzaqTA.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": ["/assets/root-Bb0NjtXN.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth": { "id": "routes/_auth", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth-CDCHImW9.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.signup": { "id": "routes/_auth.signup", "parentId": "routes/_auth", "path": "signup", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.signup-BkARTIsU.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.login": { "id": "routes/_auth.login", "parentId": "routes/_auth", "path": "login", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.login-7By8C_wn.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.verify": { "id": "routes/_auth.verify", "parentId": "routes/_auth", "path": "verify", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.verify-jwyLjzaY.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.onboarding": { "id": "routes/_auth.onboarding", "parentId": "routes/_auth", "path": "onboarding", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.onboarding-DyCJx3jN.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app": { "id": "routes/_app", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app-BhoXYoAc.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app._index": { "id": "routes/_app._index", "parentId": "routes/_app", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app._index-CZyeJvlR.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.members": { "id": "routes/_app.members", "parentId": "routes/_app", "path": "members", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.members-CJsmgsCX.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.staff": { "id": "routes/_app.staff", "parentId": "routes/_app", "path": "staff", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.staff-BJKCU2yr.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.plans": { "id": "routes/_app.plans", "parentId": "routes/_app", "path": "plans", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.plans-fhViiXQZ.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.payments": { "id": "routes/_app.payments", "parentId": "routes/_app", "path": "payments", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.payments-Ciu7ZoVp.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-3eaea937.js", "version": "3eaea937", "sri": void 0 };
+const serverManifest = { "entry": { "module": "/assets/entry.client-bNIrH7sc.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": true, "module": "/assets/root-Cjf4hnpA.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": ["/assets/root-BYqAUSYH.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth": { "id": "routes/_auth", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth-DtABNya8.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.signup": { "id": "routes/_auth.signup", "parentId": "routes/_auth", "path": "signup", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.signup-B51Ol8Zg.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.login": { "id": "routes/_auth.login", "parentId": "routes/_auth", "path": "login", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.login-Ct0Cuprh.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.verify": { "id": "routes/_auth.verify", "parentId": "routes/_auth", "path": "verify", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.verify-DiYed5aU.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_auth.onboarding": { "id": "routes/_auth.onboarding", "parentId": "routes/_auth", "path": "onboarding", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_auth.onboarding-DXup9dwz.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app": { "id": "routes/_app", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app-BhoXYoAc.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app._index": { "id": "routes/_app._index", "parentId": "routes/_app", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app._index-CZyeJvlR.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.members": { "id": "routes/_app.members", "parentId": "routes/_app", "path": "members", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.members-CJsmgsCX.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.staff": { "id": "routes/_app.staff", "parentId": "routes/_app", "path": "staff", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.staff-BJKCU2yr.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.plans": { "id": "routes/_app.plans", "parentId": "routes/_app", "path": "plans", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.plans-fhViiXQZ.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_app.payments": { "id": "routes/_app.payments", "parentId": "routes/_app", "path": "payments", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/_app.payments-Ciu7ZoVp.js", "imports": ["/assets/chunk-QFMPRPBF-CYRDN3J4.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-bc7d8589.js", "version": "bc7d8589", "sri": void 0 };
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
 const future = { "unstable_optimizeDeps": false, "unstable_passThroughRequests": false, "unstable_subResourceIntegrity": false, "unstable_trailingSlashAwareDataRequests": false, "unstable_previewServerPrerendering": false, "v8_middleware": false, "v8_splitRouteModules": false, "v8_viteEnvironmentApi": false };
