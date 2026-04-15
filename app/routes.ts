@@ -1,6 +1,9 @@
 import { type RouteConfig, layout, route, index } from "@react-router/dev/routes";
 
 export default [
+  // Sign out (no layout)
+  route("logout", "routes/logout.tsx"),
+
   // Auth screens (no sidebar)
   layout("routes/_auth.tsx", [
     route("signup", "routes/_auth.signup.tsx"),

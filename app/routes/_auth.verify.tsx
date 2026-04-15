@@ -1,14 +1,13 @@
-import { Form, redirect, useNavigation } from "react-router";
+import { Form, redirect, useNavigation, useSubmit } from "react-router";
+import { useState, useRef, useEffect } from "react";
 import type { Route } from "./+types/_auth.verify";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { requireSession } = await import("~/lib/session.server");
   const session = await requireSession(request);
   const stage = session.get("stage");
-
   if (stage === "verified") throw redirect("/onboarding");
   if (stage === "onboarded") throw redirect("/");
-
   return {
     email: session.get("email") ?? "",
     firstName: session.get("firstName") ?? "",
@@ -31,14 +30,10 @@ export async function action({ request }: Route.ActionArgs) {
 
   const code = form.get("code") as string;
   const result = await api.post<{ token: string; stage: string; user: { firstName: string; email: string } }>(
-    "/api/auth/verify-otp",
-    { code },
-    token
+    "/api/auth/verify-otp", { code }, token
   );
 
-  if (!result.success) {
-    return { error: result.message ?? "Invalid OTP.", resent: false };
-  }
+  if (!result.success) return { error: result.message ?? "Invalid or expired code.", resent: false };
 
   session.set("token", result.token!);
   session.set("stage", "verified");
@@ -48,55 +43,146 @@ export async function action({ request }: Route.ActionArgs) {
   });
 }
 
+// ─── OTP boxes ────────────────────────────────────────────────────────────────
+
+function OtpBoxes({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const digits = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
+  const refs   = useRef<(HTMLInputElement | null)[]>([]);
+
+  const commit = (next: string[]) => onChange(next.join(""));
+
+  const handleChange = (idx: number, raw: string) => {
+    const d = raw.replace(/\D/g, "").slice(-1);
+    const next = digits.map((v, i) => (i === idx ? d : v));
+    commit(next);
+    if (d && idx < 5) refs.current[idx + 1]?.focus();
+  };
+
+  const handleKey = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (digits[idx]) {
+        const next = digits.map((v, i) => (i === idx ? "" : v));
+        commit(next);
+      } else if (idx > 0) {
+        const next = digits.map((v, i) => (i === idx - 1 ? "" : v));
+        commit(next);
+        refs.current[idx - 1]?.focus();
+      }
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      const next = digits.map((v, i) => (i === idx ? "" : v));
+      commit(next);
+    } else if (e.key === "ArrowLeft"  && idx > 0) refs.current[idx - 1]?.focus();
+    else if   (e.key === "ArrowRight" && idx < 5) refs.current[idx + 1]?.focus();
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const next = Array.from({ length: 6 }, (_, i) => text[i] ?? "");
+    commit(next);
+    refs.current[Math.min(text.length, 5)]?.focus();
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+      {digits.map((d, i) => (
+        <input
+          key={i}
+          ref={(el) => { refs.current[i] = el; }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={d}
+          autoComplete={i === 0 ? "one-time-code" : "off"}
+          autoFocus={i === 0}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKey(i, e)}
+          onPaste={handlePaste}
+          onFocus={(e) => e.target.select()}
+          className="otp-digit"
+          style={{
+            width: 48,
+            height: 56,
+            flexShrink: 0,
+            textAlign: "center",
+            fontSize: 22,
+            fontWeight: 800,
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            borderRadius: 12,
+            border: `2px solid ${d ? "#f97316" : "#e2e8f0"}`,
+            background: d ? "rgba(249,115,22,0.06)" : "#f8fafc",
+            outline: "none",
+            color: "#0f172a",
+            caretColor: "transparent",
+            transition: "all 0.15s ease",
+          }}
+        />
+      ))}
+      <style>{`
+        .otp-digit:focus {
+          border-color: #f97316 !important;
+          background: #fff !important;
+          box-shadow: 0 0 0 4px rgba(249,115,22,0.12) !important;
+          transform: scale(1.04);
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function Verify({ loaderData, actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const navigation   = useNavigation();
+  const submit       = useSubmit();
   const isSubmitting = navigation.state === "submitting";
   const { email, firstName } = loaderData;
+  const [code, setCode] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const filled = code.replace(/[^0-9]/g, "").length === 6;
+
+  // Auto-submit when all 6 digits are entered
+  useEffect(() => {
+    if (filled && !isSubmitting) {
+      submit(formRef.current);
+    }
+  }, [filled, code]);
 
   return (
     <div className="flex-1">
-      {/* Icon + heading */}
-      <div className="mb-6">
+
+      {/* ── Header ── */}
+      <div className="mb-8">
         <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
-          style={{
-            background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.15))",
-            border: "1px solid rgba(99,102,241,0.3)",
-            boxShadow: "0 0 24px rgba(99,102,241,0.15)",
-          }}>
-          <svg className="w-6 h-6" style={{ color: "#a5b4fc" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.18)" }}>
+          <svg className="w-6 h-6" style={{ color: "#f97316" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
-          style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc" }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse inline-block" />
-          Code expires in 10 minutes
-        </div>
-
-        <h1 className="text-[26px] font-black tracking-tight leading-tight"
-          style={{ background: "linear-gradient(135deg, #fff 30%, #a5b4fc 70%, #67e8f9 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-          Verify your email
-        </h1>
-        <p className="mt-1.5 text-sm" style={{ color: "rgba(148,163,184,0.8)" }}>
-          Hi <span style={{ color: "#e2e8f0", fontWeight: 600 }}>{firstName}</span>! We sent a 6-digit code to{" "}
-          <span style={{ color: "#a5b4fc", fontWeight: 500 }}>{email}</span>.
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Check your email</h1>
+        <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
+          We sent a 6-digit code to{" "}
+          <span className="font-semibold text-gray-800">{email}</span>
         </p>
       </div>
 
-      {/* Success */}
+      {/* ── Alerts ── */}
       {actionData?.resent && (
-        <div className="mb-4 p-3 rounded-xl text-sm"
-          style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#6ee7b7" }}>
-          A new code has been sent to your email.
+        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2"
+          style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#15803d" }}>
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          New code sent — check your inbox.
         </div>
       )}
-
-      {/* Error */}
       {actionData?.error && (
-        <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#fca5a5" }}>
+        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2"
+          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -105,46 +191,39 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
         </div>
       )}
 
-      <Form method="post" className="space-y-4">
+      {/* ── Form ── */}
+      <Form ref={formRef} method="post" className="space-y-6">
+        <input type="hidden" name="code" value={code} />
+
         <div>
-          <label className="block text-xs font-semibold mb-1.5 uppercase tracking-widest"
-            style={{ color: "rgba(148,163,184,0.7)" }}>Verification code</label>
-          <input
-            name="code"
-            type="text"
-            required
-            maxLength={6}
-            autoComplete="one-time-code"
-            inputMode="numeric"
-            pattern="[0-9]{6}"
-            placeholder="000000"
-            className="auth-input"
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "10px",
-              color: "#f1f5f9",
-              fontSize: "28px",
-              padding: "12px 14px",
-              width: "100%",
-              outline: "none",
-              textAlign: "center",
-              letterSpacing: "0.5em",
-              fontFamily: "monospace",
-              transition: "border-color 0.2s, box-shadow 0.2s",
-            }}
-          />
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
+            Enter 6-digit code
+          </p>
+          <OtpBoxes value={code} onChange={setCode} />
+        </div>
+
+        {/* Progress dots */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: i < code.replace(/[^0-9]/g, "").length ? "#f97316" : "#e2e8f0",
+              transition: "background 0.2s",
+            }} />
+          ))}
         </div>
 
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full py-3 px-4 font-bold rounded-xl text-sm text-white transition-all duration-300 flex items-center justify-center gap-2"
+          disabled={isSubmitting || !filled}
+          className="w-full py-3.5 px-4 font-bold rounded-xl text-sm text-white flex items-center justify-center gap-2 transition-all duration-200"
           style={{
-            background: isSubmitting
-              ? "rgba(99,102,241,0.5)"
-              : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)",
-            boxShadow: isSubmitting ? "none" : "0 0 32px rgba(99,102,241,0.4), 0 4px 15px rgba(0,0,0,0.3)",
+            background: filled && !isSubmitting
+              ? "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)"
+              : "rgba(249,115,22,0.25)",
+            boxShadow: filled && !isSubmitting ? "0 4px 15px rgba(249,115,22,0.4), 0 2px 6px rgba(0,0,0,0.1)" : "none",
+            cursor: filled && !isSubmitting ? "pointer" : "not-allowed",
+            opacity: filled && !isSubmitting ? 1 : 0.6,
           }}
         >
           {isSubmitting ? (
@@ -155,37 +234,31 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
               </svg>
               Verifying…
             </>
-          ) : "VERIFY ACCOUNT"}
+          ) : (
+            <>
+              Verify account
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </>
+          )}
         </button>
       </Form>
 
-      <div className="mt-5 text-center">
-        <p className="text-sm" style={{ color: "rgba(148,163,184,0.6)" }}>
-          Didn't receive the code?{" "}
-          <Form method="post" className="inline">
-            <input type="hidden" name="intent" value="resend" />
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="font-semibold transition disabled:opacity-40"
-              style={{ color: "#a5b4fc" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#c7d2fe")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#a5b4fc")}
-            >
-              Resend code
-            </button>
-          </Form>
-        </p>
-      </div>
-
-      <style>{`
-        .auth-input::placeholder { color: rgba(148,163,184,0.25); }
-        .auth-input:focus {
-          border-color: rgba(99,102,241,0.6) !important;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 0 12px rgba(99,102,241,0.1);
-        }
-        .auth-input:hover { border-color: rgba(255,255,255,0.2) !important; }
-      `}</style>
+      {/* ── Resend ── */}
+      <p className="mt-6 text-center text-sm text-slate-400">
+        Didn't receive it?{" "}
+        <Form method="post" className="inline">
+          <input type="hidden" name="intent" value="resend" />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="font-semibold text-orange-600 hover:text-orange-500 transition-colors disabled:opacity-40"
+          >
+            Resend code
+          </button>
+        </Form>
+      </p>
     </div>
   );
 }

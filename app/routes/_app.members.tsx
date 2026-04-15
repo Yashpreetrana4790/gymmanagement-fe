@@ -52,11 +52,11 @@ export async function action({ request }: Route.ActionArgs) {
 
 const TYPE_BADGE: Record<string, string> = {
   premium: "bg-amber-100 text-amber-700",
-  standard: "bg-blue-100 text-blue-700",
+  standard: "bg-orange-100 text-orange-700",
   basic: "bg-gray-100 text-gray-600",
 };
 
-const inputCls = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+const inputCls = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition";
 
 export default function Members({ loaderData, actionData }: Route.ComponentProps) {
   const { members } = loaderData;
@@ -84,7 +84,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition"
+          className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl transition"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showForm ? "M6 18L18 6M6 6l12 12" : "M12 4v16m8-8H4"} />
@@ -164,7 +164,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-xl transition"
+                  className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm font-semibold rounded-xl transition"
                 >
                   {isSubmitting ? "Adding…" : "Add member"}
                 </button>
@@ -210,7 +210,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                     <tr key={member._id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 text-xs font-bold shrink-0">
                             {name[0]?.toUpperCase() ?? "?"}
                           </div>
                           <div>

@@ -37,7 +37,7 @@ export default function Staff({ loaderData }: Route.ComponentProps) {
       {/* Role cards */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          { label: "Trainers", count: 0, color: "bg-blue-50 text-blue-600" },
+          { label: "Trainers", count: 0, color: "bg-orange-50 text-orange-500" },
           { label: "Managers", count: 0, color: "bg-purple-50 text-purple-600" },
           { label: "Receptionists", count: 0, color: "bg-emerald-50 text-emerald-600" },
         ].map((r) => (

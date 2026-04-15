@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, redirect, Form } from "react-router";
+import { Link, NavLink, Outlet, Form, redirect } from "react-router";
 import type { Route } from "./+types/_app";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -21,13 +21,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user: result.user };
 }
 
-export async function action({ request }: Route.ActionArgs) {
-  const { getSession, destroySession } = await import("~/lib/session.server");
-  const session = await getSession(request);
-  return redirect("/login", {
-    headers: { "Set-Cookie": await destroySession(session) },
-  });
-}
 
 const navItems = [
   {
@@ -91,7 +84,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       <aside className="w-64 bg-slate-900 flex flex-col">
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5">
-          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)" }}>
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -116,7 +109,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-blue-600 text-white shadow-sm"
+                    ? "bg-orange-500 text-white shadow-sm"
                     : "text-slate-400 hover:text-white hover:bg-slate-800"
                 }`
               }
@@ -131,7 +124,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
         <div className="p-3">
           <div className="bg-slate-800 rounded-xl p-3">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)" }}>
                 {user?.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
               <div className="min-w-0 flex-1">
@@ -141,7 +134,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
                 <p className="text-slate-400 text-xs truncate">{user?.email}</p>
               </div>
             </div>
-            <Form method="post">
+            <Form method="post" action="/logout">
               <button
                 type="submit"
                 className="w-full flex items-center justify-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-colors"

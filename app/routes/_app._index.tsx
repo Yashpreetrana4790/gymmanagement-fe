@@ -59,7 +59,7 @@ function StatCard({
           <p className="text-sm font-medium text-gray-500">{label}</p>
           <p className="mt-1 text-3xl font-bold text-gray-900 tracking-tight">{value}</p>
         </div>
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
           {icon}
         </div>
       </div>
@@ -86,7 +86,7 @@ function QuickActionCard({
       to={href}
       className="group bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-start gap-4"
     >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${accent} group-hover:scale-110 transition-transform`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent} group-hover:scale-110 transition-transform`}>
         {icon}
       </div>
       <div>
@@ -112,7 +112,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       label: "Total Members",
       value: stats.totalMembers,
       sub: stats.totalMembers === 0 ? "Add your first member to get started" : "Registered members",
-      accent: "bg-blue-50 text-blue-600",
+      accent: "bg-orange-50 text-orange-500",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -163,7 +163,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       label: "Add Member",
       description: "Register a new gym member",
       href: "/members",
-      accent: "bg-blue-600 text-white",
+      accent: "bg-orange-500 text-white",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -214,12 +214,12 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       title: "Member Management",
       description: "Track profiles, contact info, membership status, and attendance history for every member.",
       icon: (
-        <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
-      color: "bg-blue-50",
+      color: "bg-orange-50",
     },
     {
       title: "Flexible Plans",
@@ -284,11 +284,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 
         {/* Getting started banner — shown when no members */}
         {stats.totalMembers === 0 && (
-          <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 rounded-2xl p-8 text-white">
+          <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 rounded-2xl p-8 text-white">
             <div className="absolute inset-0 opacity-10"
               style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #3b82f6 0%, transparent 50%)" }} />
             <div className="relative">
-              <div className="inline-flex items-center gap-2 bg-blue-600/30 border border-blue-400/30 rounded-full px-3 py-1 text-blue-300 text-xs font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-orange-500/30 border border-orange-400/30 rounded-full px-3 py-1 text-orange-300 text-xs font-semibold mb-4">
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                 </svg>
@@ -301,7 +301,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/plans"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
+                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -337,7 +337,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Recent members</h2>
-              <Link to="/members" className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+              <Link to="/members" className="text-xs text-orange-500 hover:text-orange-600 font-medium">
                 View all
               </Link>
             </div>
@@ -355,7 +355,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 text-xs font-bold flex items-center justify-center shrink-0">
                             {m.name?.[0]?.toUpperCase() ?? "?"}
                           </div>
                           <span className="font-medium text-gray-800">{m.name}</span>
@@ -387,7 +387,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 <p className="text-xs text-gray-400 mt-1">Add your first member to see them here.</p>
                 <Link
                   to="/members"
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-orange-500 hover:text-orange-600"
                 >
                   Add member
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

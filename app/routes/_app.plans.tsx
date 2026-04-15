@@ -50,12 +50,12 @@ export async function action({ request }: Route.ActionArgs) {
 
 const TYPE_STYLE: Record<string, string> = {
   premium: "border-amber-200 bg-amber-50",
-  standard: "border-blue-200 bg-blue-50",
+  standard: "border-orange-200 bg-orange-50",
   basic: "border-gray-200 bg-white",
 };
 const TYPE_BADGE: Record<string, string> = {
   premium: "bg-amber-100 text-amber-700",
-  standard: "bg-blue-100 text-blue-700",
+  standard: "bg-orange-100 text-orange-700",
   basic: "bg-gray-100 text-gray-600",
 };
 
@@ -134,13 +134,13 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Plan name</label>
             <input name="name" required type="text" placeholder="e.g. Monthly Basic"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
             <select name="type" required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white">
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition bg-white">
               <option value="basic">Basic</option>
               <option value="standard">Standard</option>
               <option value="premium">Premium</option>
@@ -150,13 +150,13 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Duration (days)</label>
             <input name="durationDays" required type="number" min="1" placeholder="30"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Price (₹)</label>
             <input name="price" required type="number" min="0" placeholder="999"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" />
           </div>
 
           <div className="sm:col-span-2">
@@ -164,12 +164,12 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
               Features <span className="text-gray-400 font-normal">(comma-separated)</span>
             </label>
             <input name="features" type="text" placeholder="Unlimited classes, Locker room, Personal trainer"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" />
           </div>
 
           <div className="sm:col-span-2">
             <button type="submit" disabled={isSubmitting}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
               {isSubmitting ? "Creating…" : "Create plan"}
             </button>
           </div>
