@@ -148,7 +148,7 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
     if (filled && !isSubmitting) {
       submit(formRef.current);
     }
-  }, [filled, code]);
+  }, [filled, isSubmitting]);
 
   return (
     <div className="flex-1">

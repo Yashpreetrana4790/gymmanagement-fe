@@ -1,4 +1,5 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from "react-router";
+import { ToastProvider } from "~/components/Toast";
 import "./tailwind.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -23,17 +24,48 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <ToastProvider />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: { error: unknown }) {
-  const message = error instanceof Error ? error.message : "Unknown error";
+  let status = 500;
+  let message = "An unexpected error occurred.";
+
+  if (isRouteErrorResponse(error)) {
+    status  = error.status;
+    message = typeof error.data === "string" ? error.data : error.statusText;
+  } else if (error instanceof Error) {
+    message = error.message;
+  }
+
+  const is404 = status === 404;
+
   return (
-    <div className="flex min-h-screen items-center justify-center p-8">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-red-600">Something went wrong</h1>
-        <p className="mt-2 text-gray-600">{message}</p>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center"
+      style={{ background: is404 ? "linear-gradient(135deg,#fff7ed,#fffbeb)" : "#f9fafb" }}>
+      {is404 ? (
+        <>
+          <span style={{ fontSize: 72, filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.15))", animation: "float 4s ease-in-out infinite" }}>🏝️</span>
+          <p className="text-7xl font-black mt-4 mb-2" style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>404</p>
+          <h1 className="text-xl font-bold text-gray-900">Lost at sea</h1>
+          <p className="text-sm text-gray-400 mt-1">{message}</p>
+        </>
+      ) : (
+        <>
+          <p className="text-6xl font-black text-orange-500 mb-3">{status}</p>
+          <h1 className="text-xl font-bold text-gray-900">Something went wrong</h1>
+          <p className="text-sm text-gray-400 mt-1">{message}</p>
+        </>
+      )}
+      <a href="/" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-500 hover:text-orange-600 transition">
+        ← Go home
+      </a>
+      <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
     </div>
   );
 }

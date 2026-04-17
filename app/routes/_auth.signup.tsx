@@ -65,7 +65,7 @@ export default function Signup({ actionData }: Route.ComponentProps) {
         <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
           style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", color: "#c2410c" }}>
           <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "#f97316" }} />
-          Free forever · No credit card needed
+          No credit card needed
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Get Started Now</h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -99,7 +99,7 @@ export default function Signup({ actionData }: Route.ComponentProps) {
         </div>
 
         <div>
-          <Label>Phone Number</Label>
+          <Label>Phone Number <span className="text-red-500">*</span></Label>
           <input name="phone" required type="tel" autoComplete="tel"
             placeholder="+91 98765 43210" className="auth-input" />
         </div>

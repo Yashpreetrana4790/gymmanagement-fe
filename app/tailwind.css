@@ -10,6 +10,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+button:not(:disabled) { cursor: pointer; }
+
 @keyframes saturn-revolve {
   from { transform: rotateY(0deg); }
   to   { transform: rotateY(360deg); }

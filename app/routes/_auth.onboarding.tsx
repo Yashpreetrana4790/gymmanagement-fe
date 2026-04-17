@@ -1,5 +1,6 @@
 import { Form, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/_auth.onboarding";
+import { gymProfileSchema, parseErrors, type FieldErrors } from "~/lib/validations";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { requireSession } = await import("~/lib/session.server");
@@ -19,23 +20,30 @@ export async function action({ request }: Route.ActionArgs) {
   const token = session.get("token")!;
   const form = await request.formData();
 
+  const raw = {
+    gymName:  (form.get("gymName")  as string) ?? "",
+    strength: (form.get("strength") as string) ?? "",
+    city:     (form.get("city")     as string) ?? "",
+    state:    (form.get("state")    as string) ?? "",
+    address:  (form.get("address")  as string) ?? "",
+    pincode:  (form.get("pincode")  as string) ?? "",
+    phone:    (form.get("phone")    as string) ?? "",
+    email:    (form.get("email")    as string) ?? "",
+  };
+
+  const parsed = gymProfileSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { fields: parseErrors(parsed.error) as FieldErrors, error: null };
+  }
+
   const result = await api.post<{ data: unknown }>(
     "/api/gym-profile",
-    {
-      gymName: form.get("gymName"),
-      strength: Number(form.get("strength")),
-      city: form.get("city"),
-      state: form.get("state"),
-      address: form.get("address"),
-      pincode: form.get("pincode"),
-      phone: form.get("phone"),
-      email: form.get("email"),
-    },
+    parsed.data,
     token
   );
 
   if (!result.success) {
-    return { error: result.message ?? "Failed to create gym profile." };
+    return { error: result.message ?? "Failed to create gym profile.", fields: null };
   }
 
   session.set("stage", "onboarded");
@@ -45,7 +53,9 @@ export async function action({ request }: Route.ActionArgs) {
   });
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function Field({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
     <div>
       <label className="block text-xs font-semibold mb-1.5 uppercase tracking-widest text-slate-500">
@@ -56,16 +66,31 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 export default function Onboarding({ loaderData, actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const { firstName } = loaderData;
 
+  const fields = (actionData as any)?.fields as FieldErrors | null;
+  const error  = (actionData as any)?.error  as string | null;
+
+  const err = (name: string) => fields?.[name];
+  const invalid = (name: string) => (err(name) ? "!border-red-400" : "");
+
   return (
     <div className="flex-1">
       <div className="mb-5">
-        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
-          style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#b45309" }}>
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
+          style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#b45309" }}
+        >
           <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "#f59e0b" }} />
           Step 3 of 3 — Final step
         </div>
@@ -75,36 +100,43 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
         </p>
       </div>
 
-      <div className="mb-4 h-px w-full"
-        style={{ background: "linear-gradient(90deg, transparent, #fde68a, #fed7aa, transparent)" }} />
+      <div
+        className="mb-4 h-px w-full"
+        style={{ background: "linear-gradient(90deg, transparent, #fde68a, #fed7aa, transparent)" }}
+      />
 
-      {actionData?.error && (
-        <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
+      {error && (
+        <div
+          className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
+          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}
+        >
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {actionData.error}
+          {error}
         </div>
       )}
 
       <Form method="post" className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Gym Name *">
-            <input name="gymName" required type="text" placeholder="Iron Paradise Gym"
-              className="auth-input" />
+          <Field label={<>Gym Name<span className="text-red-500 ml-0.5">*</span></>}>
+            <input name="gymName" type="text" placeholder="Iron Paradise Gym"
+              className={`auth-input ${invalid("gymName")}`} />
+            <FieldError msg={err("gymName")} />
           </Field>
-          <Field label="Capacity (members) *">
-            <input name="strength" required type="number" min={1} placeholder="200"
-              className="auth-input" />
+          <Field label={<>Capacity (members)<span className="text-red-500 ml-0.5">*</span></>}>
+            <input name="strength" type="number" min={1} placeholder="200"
+              className={`auth-input ${invalid("strength")}`} />
+            <FieldError msg={err("strength")} />
           </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="City *">
-            <input name="city" required type="text" placeholder="Mumbai"
-              className="auth-input" />
+          <Field label={<>City<span className="text-red-500 ml-0.5">*</span></>}>
+            <input name="city" type="text" placeholder="Mumbai"
+              className={`auth-input ${invalid("city")}`} />
+            <FieldError msg={err("city")} />
           </Field>
           <Field label="State">
             <input name="state" type="text" placeholder="Maharashtra"
@@ -120,17 +152,20 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
         <div className="grid grid-cols-2 gap-3">
           <Field label="Pincode">
             <input name="pincode" type="text" placeholder="400053"
-              className="auth-input" />
+              className={`auth-input ${invalid("pincode")}`} />
+            <FieldError msg={err("pincode")} />
           </Field>
           <Field label="Gym Contact">
             <input name="phone" type="tel" placeholder="+91 98765 43210"
-              className="auth-input" />
+              className={`auth-input ${invalid("phone")}`} />
+            <FieldError msg={err("phone")} />
           </Field>
         </div>
 
         <Field label="Gym Email">
           <input name="email" type="email" placeholder="gym@example.com"
-            className="auth-input" />
+            className={`auth-input ${invalid("email")}`} />
+          <FieldError msg={err("email")} />
         </Field>
 
         <button
@@ -143,6 +178,7 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
               : "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)",
             boxShadow: isSubmitting ? "none" : "0 4px 14px rgba(245,158,11,0.3)",
             opacity: isSubmitting ? 0.8 : 1,
+            cursor: isSubmitting ? "not-allowed" : "pointer",
           }}
         >
           {isSubmitting ? (

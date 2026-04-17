@@ -146,19 +146,28 @@ export default function AuthLayout() {
             )}
           </div>
 
-          <p className="text-slate-700 text-xs">© {new Date().getFullYear()} Gravity Gym. All rights reserved.</p>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11 }}>© {new Date().getFullYear()} Gravity Gym. All rights reserved.</p>
         </div>
       </div>
 
-      {/* ── RIGHT: Clean light form panel ─────────────────── */}
-      <div className="flex-1 flex items-center justify-center relative px-6 py-10"
-        style={{ background: "#f1f5f9" }}>
+      {/* ── RIGHT: Form panel ─────────────────── */}
+      <div className="flex-1 flex items-center justify-center relative px-6 py-10 overflow-hidden"
+        style={{ background: "linear-gradient(145deg, #fafafa 0%, #fff7ed 50%, #fef3c7 100%)" }}>
 
-        {/* Dot grid pattern */}
+        {/* Dot grid */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)",
-          backgroundSize: "20px 20px",
+          backgroundImage: "radial-gradient(circle, #fed7aa 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+          opacity: 0.55,
         }} />
+
+        {/* Ambient blobs */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(251,146,60,0.13) 0%, transparent 70%)" }} />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(245,158,11,0.10) 0%, transparent 70%)" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.70) 0%, transparent 65%)" }} />
 
         <div className="relative z-10 w-full max-w-md">
           {/* Mobile logo */}
@@ -166,9 +175,9 @@ export default function AuthLayout() {
             <GravityLogo size="md" variant="light" id="logo-mobile" />
           </div>
 
-          {/* White card */}
-          <div className="rounded-2xl bg-white p-8"
-            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}>
+          {/* Card */}
+          <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-8"
+            style={{ boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(249,115,22,0.08), 0 0 0 1px rgba(249,115,22,0.08)" }}>
             <Outlet />
           </div>
         </div>

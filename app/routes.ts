@@ -16,8 +16,11 @@ export default [
   layout("routes/_app.tsx", [
     index("routes/_app._index.tsx"),
     route("members", "routes/_app.members.tsx"),
+    route("members/:id", "routes/_app.members.$id.tsx"),
     route("staff", "routes/_app.staff.tsx"),
     route("plans", "routes/_app.plans.tsx"),
     route("payments", "routes/_app.payments.tsx"),
   ]),
+  // 404 catch-all
+  route("*", "routes/$.tsx"),
 ] satisfies RouteConfig;

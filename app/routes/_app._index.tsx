@@ -1,11 +1,14 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/_app._index";
 
+const todayMD = (d: Date) => `${d.getMonth()}-${d.getDate()}`;
+
 type MemberDoc = {
   _id: string;
-  user: { firstName: string; lastName: string; email: string };
+  user: { firstName: string; lastName: string; email: string; dateOfBirth?: string };
   membershipType: string;
   membershipEnd: string;
+  isActive: boolean;
   createdAt: string;
 };
 
@@ -21,7 +24,74 @@ export async function loader({ request }: Route.LoaderArgs) {
     api.get<{ count: number }>("/api/plans", token),
   ]);
 
-  const recentMembers = (membersRes.data ?? []).slice(0, 5).map((m) => ({
+  const members: MemberDoc[] = membersRes.data ?? [];
+  const now = new Date();
+
+  // ── Stats ──────────────────────────────────────────────────────────────────
+  const activeTrainees = members.filter(
+    (m) => m.isActive && new Date(m.membershipEnd) >= now
+  ).length;
+
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+  const lastMonthDate = new Date(thisYear, thisMonth - 1, 1);
+
+  const newThisMonth = members.filter((m) => {
+    const d = new Date(m.createdAt);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  }).length;
+
+  const newLastMonth = members.filter((m) => {
+    const d = new Date(m.createdAt);
+    return d.getMonth() === lastMonthDate.getMonth() && d.getFullYear() === lastMonthDate.getFullYear();
+  }).length;
+
+  const monthlyGrowth =
+    newLastMonth === 0
+      ? newThisMonth > 0 ? 100 : 0
+      : Math.round(((newThisMonth - newLastMonth) / newLastMonth) * 100);
+
+  // ── Birthdays (today + next 7 days) ────────────────────────────────────────
+  const upcomingDates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + i);
+    return todayMD(d);
+  });
+
+  const birthdays = members
+    .filter((m) => {
+      if (!m.user.dateOfBirth) return false;
+      const dob = new Date(m.user.dateOfBirth);
+      return upcomingDates.includes(todayMD(dob));
+    })
+    .map((m) => {
+      const dob = new Date(m.user.dateOfBirth!);
+      const upcoming = new Date(thisYear, dob.getMonth(), dob.getDate());
+      if (upcoming < now) upcoming.setFullYear(thisYear + 1);
+      const diffDays = Math.round((upcoming.getTime() - now.getTime()) / 86400000);
+      return {
+        name: `${m.user.firstName} ${m.user.lastName}`.trim(),
+        dob: m.user.dateOfBirth!,
+        daysUntil: diffDays,
+      };
+    })
+    .sort((a, b) => a.daysUntil - b.daysUntil);
+
+  // ── Expiring soon (next 7 days) ─────────────────────────────────────────────
+  const expiringSoon = members
+    .filter((m) => {
+      const end = new Date(m.membershipEnd);
+      const diff = (end.getTime() - now.getTime()) / 86400000;
+      return diff >= 0 && diff <= 7;
+    })
+    .map((m) => ({
+      name: `${m.user.firstName} ${m.user.lastName}`.trim(),
+      membershipEnd: m.membershipEnd,
+      membershipType: m.membershipType,
+    }))
+    .sort((a, b) => new Date(a.membershipEnd).getTime() - new Date(b.membershipEnd).getTime());
+
+  const recentMembers = members.slice(0, 5).map((m) => ({
     name: `${m.user.firstName} ${m.user.lastName}`.trim(),
     plan: m.membershipType,
     joinedAt: m.createdAt,
@@ -30,40 +100,72 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {
     firstName,
     stats: {
-      totalMembers: membersRes.count ?? 0,
-      activePlans: plansRes.count ?? 0,
-      monthlyRevenue: 0,
-      attendance: 0,
+      totalMembers:   members.length,
+      activeTrainees,
+      newThisMonth,
+      monthlyGrowth,
+      activePlans:    plansRes.count ?? 0,
     },
     recentMembers,
+    birthdays,
+    expiringSoon,
   };
 }
+
+// ─── Stat Card ────────────────────────────────────────────────────────────────
 
 function StatCard({
   label,
   value,
   sub,
-  icon,
-  accent,
+  subColor,
+  emoji,
+  iconBg,
+  iconShadow,
 }: {
   label: string;
   value: string | number;
   sub?: string;
-  icon: React.ReactNode;
-  accent: string;
+  subColor?: string;
+  emoji: string;
+  iconBg: string;
+  iconShadow: string;
 }) {
+  const hasTrend = sub?.includes("%");
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col gap-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className="mt-1 text-3xl font-bold text-gray-900 tracking-tight">{value}</p>
-        </div>
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
-          {icon}
-        </div>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default flex items-center gap-4 px-5 py-4">
+      {/* Clay 3D emoji icon */}
+      <div
+        className="shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl select-none"
+        style={{
+          background: iconBg,
+          boxShadow: `0 6px 16px ${iconShadow}, inset 0 1px 1px rgba(255,255,255,0.55)`,
+        }}
+      >
+        {emoji}
       </div>
-      {sub && <p className="text-xs text-gray-400">{sub}</p>}
+
+      {/* Text */}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <p className="text-3xl font-black text-gray-900 tracking-tight leading-none">{value}</p>
+        <p className="text-sm font-semibold text-gray-700 mt-1 truncate">{label}</p>
+
+        {/* Plain sub text — only when no trend % */}
+        {sub && !hasTrend && (
+          <p className={`text-xs mt-0.5 font-medium truncate ${subColor ?? "text-gray-400"}`}>{sub}</p>
+        )}
+
+        {/* Trend pill — only when sub is a % string */}
+        {hasTrend && (
+          <span className={`inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+            subColor === "text-emerald-600" ? "bg-emerald-50 text-emerald-600"
+            : subColor === "text-red-500"   ? "bg-red-50 text-red-500"
+            : "bg-gray-100 text-gray-500"
+          }`}>
+            {sub}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -97,64 +199,61 @@ function QuickActionCard({
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const { stats, firstName, recentMembers } = loaderData;
+  const { stats, firstName, recentMembers, birthdays, expiringSoon } = loaderData;
 
   const today = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
   const statCards = [
     {
-      label: "Total Members",
-      value: stats.totalMembers,
-      sub: stats.totalMembers === 0 ? "Add your first member to get started" : "Registered members",
-      accent: "bg-orange-50 text-orange-500",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
+      label: "Active Trainees",
+      value: stats.activeTrainees,
+      sub: stats.activeTrainees === 0 ? "No active memberships yet" : "Currently active",
+      subColor: "text-gray-400",
+      emoji: "🏋️",
+      iconBg: "linear-gradient(145deg,#fed7aa,#fb923c)",
+      iconShadow: "rgba(249,115,22,0.35)",
+    },
+    {
+      label: "New this month",
+      value: stats.newThisMonth,
+      sub:
+        stats.newThisMonth === 0
+          ? "No new members yet"
+          : stats.monthlyGrowth > 0
+          ? `+${stats.monthlyGrowth}% vs last month`
+          : stats.monthlyGrowth < 0
+          ? `${stats.monthlyGrowth}% vs last month`
+          : "Same as last month",
+      subColor:
+        stats.monthlyGrowth > 0 ? "text-emerald-600"
+        : stats.monthlyGrowth < 0 ? "text-red-500"
+        : "text-gray-400",
+      emoji: "🌱",
+      iconBg: "linear-gradient(145deg,#a7f3d0,#34d399)",
+      iconShadow: "rgba(16,185,129,0.35)",
     },
     {
       label: "Active Plans",
       value: stats.activePlans,
-      sub: stats.activePlans === 0 ? "Create membership plans to sell" : "Membership plans available",
-      accent: "bg-emerald-50 text-emerald-600",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      ),
+      sub: stats.activePlans === 0 ? "Create membership plans" : "Plans available",
+      subColor: "text-gray-400",
+      emoji: "📋",
+      iconBg: "linear-gradient(145deg,#ddd6fe,#a78bfa)",
+      iconShadow: "rgba(139,92,246,0.35)",
     },
     {
-      label: "Monthly Revenue",
-      value: `₹${stats.monthlyRevenue.toLocaleString("en-IN")}`,
-      sub: "Track payments to see revenue",
-      accent: "bg-amber-50 text-amber-600",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      label: "Today's Check-ins",
-      value: stats.attendance,
-      sub: "Attendance tracking coming soon",
-      accent: "bg-violet-50 text-violet-600",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
+      label: "Total Members",
+      value: stats.totalMembers,
+      sub: stats.totalMembers === 0 ? "Add your first member" : "All time registered",
+      subColor: "text-gray-400",
+      emoji: "👥",
+      iconBg: "linear-gradient(145deg,#fde68a,#fbbf24)",
+      iconShadow: "rgba(245,158,11,0.35)",
     },
   ];
 
@@ -178,8 +277,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       accent: "bg-emerald-600 text-white",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
       ),
     },
@@ -209,56 +307,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     },
   ];
 
-  const features = [
-    {
-      title: "Member Management",
-      description: "Track profiles, contact info, membership status, and attendance history for every member.",
-      icon: (
-        <svg className="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-      color: "bg-orange-50",
-    },
-    {
-      title: "Flexible Plans",
-      description: "Create monthly, quarterly, or annual plans. Set pricing, duration, and perks for each tier.",
-      icon: (
-        <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
-      color: "bg-emerald-50",
-    },
-    {
-      title: "Payment Tracking",
-      description: "Record fees collected, dues pending, and generate payment receipts for every transaction.",
-      icon: (
-        <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      ),
-      color: "bg-amber-50",
-    },
-    {
-      title: "Staff Management",
-      description: "Onboard trainers, assign roles, and track staff schedules across departments.",
-      icon: (
-        <svg className="w-6 h-6 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      color: "bg-violet-50",
-    },
-  ];
-
   return (
     <div className="min-h-full">
-      {/* Top header bar */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">
@@ -266,15 +317,14 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           </h1>
           <p className="text-sm text-gray-400 mt-0.5" suppressHydrationWarning>{today}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-            System online
-          </span>
-        </div>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+          System online
+        </span>
       </div>
 
       <div className="p-8 space-y-8">
+
         {/* KPI Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
           {statCards.map((card) => (
@@ -282,7 +332,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           ))}
         </div>
 
-        {/* Getting started banner — shown when no members */}
+        {/* Getting started banner */}
         {stats.totalMembers === 0 && (
           <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 rounded-2xl p-8 text-white">
             <div className="absolute inset-0 opacity-10"
@@ -296,22 +346,15 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               </div>
               <h2 className="text-2xl font-bold mb-2">Set up your gym in minutes</h2>
               <p className="text-slate-300 text-sm max-w-xl mb-6">
-                Welcome to GymManager. Create your membership plans, add your first members, and start tracking payments — all from one place.
+                Welcome to GymManager. Create membership plans, add your first members, and start tracking payments — all from one place.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/plans"
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+                <Link to="/plans"
+                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
                   Create first plan
                 </Link>
-                <Link
-                  to="/members"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition border border-white/20"
-                >
+                <Link to="/members"
+                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition border border-white/20">
                   Add a member
                 </Link>
               </div>
@@ -321,9 +364,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 
         {/* Quick actions */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-900">Quick actions</h2>
-          </div>
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Quick actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickActions.map((action) => (
               <QuickActionCard key={action.label} {...action} />
@@ -331,9 +372,10 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
 
-        {/* Two-column: Recent members + Activity */}
+        {/* Three-column: Recent members + Birthday + Expiring */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent members table */}
+
+          {/* Recent members */}
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Recent members</h2>
@@ -362,7 +404,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                         </div>
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 capitalize">
                           {m.plan ?? "—"}
                         </span>
                       </td>
@@ -384,11 +426,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   </svg>
                 </div>
                 <p className="text-sm font-medium text-gray-500">No members yet</p>
-                <p className="text-xs text-gray-400 mt-1">Add your first member to see them here.</p>
-                <Link
-                  to="/members"
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-orange-500 hover:text-orange-600"
-                >
+                <Link to="/members"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-orange-500 hover:text-orange-600">
                   Add member
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -398,49 +437,98 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             )}
           </div>
 
-          {/* At-a-glance panel */}
+          {/* Right column */}
           <div className="flex flex-col gap-4">
-            {/* Revenue placeholder */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">Revenue this month</h3>
-              <p className="text-3xl font-bold text-gray-900">₹0</p>
-              <p className="text-xs text-gray-400 mt-1">Start recording payments to track revenue</p>
-              <div className="mt-4 h-1.5 rounded-full bg-gray-100">
-                <div className="h-1.5 rounded-full bg-amber-400 w-0" />
+
+            {/* Birthdays widget */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg">🎂</span>
+                <h3 className="text-sm font-semibold text-gray-900">Upcoming birthdays</h3>
+                {birthdays.length > 0 && (
+                  <span className="ml-auto bg-pink-100 text-pink-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {birthdays.length}
+                  </span>
+                )}
               </div>
-              <p className="text-xs text-gray-400 mt-2">₹0 of monthly target</p>
+
+              {birthdays.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-5 text-center">
+                  <p className="text-xs text-gray-400">No birthdays in the next 7 days.</p>
+                  <p className="text-xs text-gray-300 mt-1">Add member DOBs to see them here.</p>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {birthdays.map((b, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-600 text-xs font-bold flex items-center justify-center shrink-0">
+                        {b.name[0]?.toUpperCase() ?? "?"}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-800 truncate">{b.name}</p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(b.dob).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                        </p>
+                      </div>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                        b.daysUntil === 0
+                          ? "bg-pink-500 text-white"
+                          : "bg-pink-50 text-pink-600"
+                      }`}>
+                        {b.daysUntil === 0 ? "Today! 🎉" : `In ${b.daysUntil}d`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Expiring soon placeholder */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex-1">
+            {/* Expiring soon */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
                 <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <h3 className="text-sm font-semibold text-gray-900">Expiring soon</h3>
+                {expiringSoon.length > 0 && (
+                  <span className="ml-auto bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {expiringSoon.length}
+                  </span>
+                )}
               </div>
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <p className="text-xs text-gray-400">Memberships expiring in the next 7 days will appear here.</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Feature highlights */}
-        <div>
-          <h2 className="text-base font-semibold text-gray-900 mb-2">What you can do with GymManager</h2>
-          <p className="text-sm text-gray-400 mb-5">Everything you need to run your gym — in one dashboard.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {features.map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div className={`w-11 h-11 rounded-xl ${f.color} flex items-center justify-center mb-4`}>
-                  {f.icon}
+              {expiringSoon.length === 0 ? (
+                <p className="text-xs text-gray-400 text-center py-4">
+                  No memberships expiring in the next 7 days.
+                </p>
+              ) : (
+                <div className="space-y-2.5">
+                  {expiringSoon.map((m, i) => {
+                    const daysLeft = Math.ceil(
+                      (new Date(m.membershipEnd).getTime() - Date.now()) / 86400000
+                    );
+                    return (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          {m.name[0]?.toUpperCase() ?? "?"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-800 truncate">{m.name}</p>
+                          <p className="text-xs text-gray-400 capitalize">{m.membershipType}</p>
+                        </div>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                          daysLeft <= 1 ? "bg-red-100 text-red-600" : "bg-amber-50 text-amber-600"
+                        }`}>
+                          {daysLeft === 0 ? "Today" : `${daysLeft}d left`}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <h3 className="text-sm font-semibold text-gray-800 mb-1">{f.title}</h3>
-                <p className="text-xs text-gray-400 leading-relaxed">{f.description}</p>
-              </div>
-            ))}
+              )}
+            </div>
+
           </div>
         </div>
       </div>

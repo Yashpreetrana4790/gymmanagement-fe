@@ -32,6 +32,11 @@ type Pages = {
   "/members": {
     params: {};
   };
+  "/members/:id": {
+    params: {
+      "id": string;
+    };
+  };
   "/staff": {
     params: {};
   };
@@ -41,12 +46,17 @@ type Pages = {
   "/payments": {
     params: {};
   };
+  "/*": {
+    params: {
+      "*": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/members" | "/staff" | "/plans" | "/payments";
+    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/members" | "/members/:id" | "/staff" | "/plans" | "/payments" | "/*";
   };
   "routes/logout.tsx": {
     id: "routes/logout";
@@ -74,7 +84,7 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/" | "/members" | "/staff" | "/plans" | "/payments";
+    page: "/" | "/members" | "/members/:id" | "/staff" | "/plans" | "/payments";
   };
   "routes/_app._index.tsx": {
     id: "routes/_app._index";
@@ -83,6 +93,10 @@ type RouteFiles = {
   "routes/_app.members.tsx": {
     id: "routes/_app.members";
     page: "/members";
+  };
+  "routes/_app.members.$id.tsx": {
+    id: "routes/_app.members.$id";
+    page: "/members/:id";
   };
   "routes/_app.staff.tsx": {
     id: "routes/_app.staff";
@@ -95,6 +109,10 @@ type RouteFiles = {
   "routes/_app.payments.tsx": {
     id: "routes/_app.payments";
     page: "/payments";
+  };
+  "routes/$.tsx": {
+    id: "routes/$";
+    page: "/*";
   };
 };
 
@@ -109,7 +127,9 @@ type RouteModules = {
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app._index": typeof import("./app/routes/_app._index.tsx");
   "routes/_app.members": typeof import("./app/routes/_app.members.tsx");
+  "routes/_app.members.$id": typeof import("./app/routes/_app.members.$id.tsx");
   "routes/_app.staff": typeof import("./app/routes/_app.staff.tsx");
   "routes/_app.plans": typeof import("./app/routes/_app.plans.tsx");
   "routes/_app.payments": typeof import("./app/routes/_app.payments.tsx");
+  "routes/$": typeof import("./app/routes/$.tsx");
 };

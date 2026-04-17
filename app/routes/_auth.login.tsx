@@ -1,5 +1,8 @@
-import { Form, Link, redirect, useNavigation } from "react-router";
+import { Form, Link, redirect, useNavigation, useActionData } from "react-router";
+import { useEffect } from "react";
 import type { Route } from "./+types/_auth.login";
+import { loginSchema, parseErrors, type FieldErrors } from "~/lib/validations";
+import { toast } from "~/components/Toast";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { redirectIfAuthenticated } = await import("~/lib/session.server");
@@ -11,17 +14,25 @@ export async function action({ request }: Route.ActionArgs) {
   const { getSession, commitSession } = await import("~/lib/session.server");
   const { api } = await import("~/lib/api.server");
   const form = await request.formData();
-  const email = form.get("email") as string;
-  const password = form.get("password") as string;
+
+  const raw = {
+    email:    (form.get("email")    as string) ?? "",
+    password: (form.get("password") as string) ?? "",
+  };
+
+  const parsed = loginSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { fields: parseErrors(parsed.error) as FieldErrors, error: null };
+  }
 
   const result = await api.post<{
     token: string;
     stage: string;
     user: { firstName: string; email: string };
-  }>("/api/auth/login", { email, password });
+  }>("/api/auth/login", parsed.data);
 
   if (!result.success) {
-    return { error: result.message ?? "Login failed." };
+    return { error: result.message ?? "Login failed.", fields: null };
   }
 
   const session = await getSession(request);
@@ -30,18 +41,30 @@ export async function action({ request }: Route.ActionArgs) {
   session.set("email", result.user!.email);
   session.set("firstName", result.user!.firstName);
 
-  const stage = result.stage;
   const destination =
-    stage === "registered" ? "/verify" : stage === "verified" ? "/onboarding" : "/";
+    result.stage === "registered" ? "/verify"
+    : result.stage === "verified"  ? "/onboarding"
+    : "/";
 
   return redirect(destination, {
     headers: { "Set-Cookie": await commitSession(session) },
   });
 }
 
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
+}
+
 export default function Login({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const navigation  = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const fields = (actionData as any)?.fields as FieldErrors | null;
+  const error  = (actionData as any)?.error  as string  | null;
+
+  useEffect(() => {
+    if (error) toast("error", error);
+  }, [error, actionData]);
 
   return (
     <div className="flex-1">
@@ -52,37 +75,28 @@ export default function Login({ actionData }: Route.ComponentProps) {
           Secure · Encrypted · Private
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Sign in to your GymManager account
-        </p>
+        <p className="mt-1 text-sm text-slate-500">Sign in to your GymManager account</p>
       </div>
-
-      {actionData?.error && (
-        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {actionData.error}
-        </div>
-      )}
 
       <Form method="post" className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-semibold mb-1.5 text-slate-700">
-            Email Address
+            Email Address <span className="text-red-500">*</span>
           </label>
-          <input id="email" name="email" type="email" required autoComplete="email"
-            placeholder="you@yourgym.com" className="auth-input" />
+          <input id="email" name="email" type="email" autoComplete="email"
+            placeholder="you@yourgym.com"
+            className={`auth-input ${fields?.email ? "!border-red-400" : ""}`} />
+          <FieldError msg={fields?.email} />
         </div>
 
         <div>
           <label htmlFor="password" className="block text-sm font-semibold mb-1.5 text-slate-700">
-            Password
+            Password <span className="text-red-500">*</span>
           </label>
-          <input id="password" name="password" type="password" required autoComplete="current-password"
-            placeholder="Enter your password" className="auth-input" />
+          <input id="password" name="password" type="password" autoComplete="current-password"
+            placeholder="Enter your password"
+            className={`auth-input ${fields?.password ? "!border-red-400" : ""}`} />
+          <FieldError msg={fields?.password} />
         </div>
 
         <button
@@ -95,6 +109,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
               : "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)",
             boxShadow: isSubmitting ? "none" : "0 4px 15px rgba(249,115,22,0.4), 0 2px 6px rgba(0,0,0,0.1)",
             opacity: isSubmitting ? 0.7 : 1,
+            cursor: isSubmitting ? "not-allowed" : "pointer",
           }}
         >
           {isSubmitting ? (
