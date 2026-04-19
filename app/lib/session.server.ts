@@ -5,6 +5,8 @@ type SessionData = {
   stage: "registered" | "verified" | "onboarded";
   email: string;
   firstName: string;
+  role: "admin" | "staff" | "member";
+  staffRole: string; // trainer | receptionist | manager | cleaner
 };
 
 const sessionStorage = createCookieSessionStorage<SessionData>({

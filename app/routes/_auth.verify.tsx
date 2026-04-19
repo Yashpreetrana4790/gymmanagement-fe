@@ -141,13 +141,18 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
   const { email, firstName } = loaderData;
   const [code, setCode] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+  const autoSubmitted = useRef(false);
   const filled = code.replace(/[^0-9]/g, "").length === 6;
 
-  // Auto-submit when all 6 digits are entered
+  // Auto-submit once when all 6 digits are entered; reset if user clears a digit
   useEffect(() => {
-    if (filled && !isSubmitting) {
-      submit(formRef.current);
+    if (!filled) {
+      autoSubmitted.current = false;
+      return;
     }
+    if (autoSubmitted.current || isSubmitting) return;
+    autoSubmitted.current = true;
+    submit(formRef.current);
   }, [filled, isSubmitting]);
 
   return (

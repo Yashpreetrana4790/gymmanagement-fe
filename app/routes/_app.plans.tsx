@@ -31,7 +31,6 @@ export async function action({ request }: Route.ActionArgs) {
   if (intent === "create") {
     const result = await api.post<{ data: Plan }>("/api/plans", {
       name: form.get("name"),
-      type: form.get("type"),
       durationDays: Number(form.get("durationDays")),
       price: Number(form.get("price")),
       features: (form.get("features") as string).split(",").map((f) => f.trim()).filter(Boolean),
@@ -135,16 +134,6 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Plan name</label>
             <input name="name" required type="text" placeholder="e.g. Monthly Basic"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
-            <select name="type" required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition bg-white">
-              <option value="basic">Basic</option>
-              <option value="standard">Standard</option>
-              <option value="premium">Premium</option>
-            </select>
           </div>
 
           <div>

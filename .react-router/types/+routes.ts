@@ -29,6 +29,12 @@ type Pages = {
   "/onboarding": {
     params: {};
   };
+  "/forgot-password": {
+    params: {};
+  };
+  "/reset-password": {
+    params: {};
+  };
   "/members": {
     params: {};
   };
@@ -40,11 +46,38 @@ type Pages = {
   "/staff": {
     params: {};
   };
+  "/staff/:id": {
+    params: {
+      "id": string;
+    };
+  };
   "/plans": {
     params: {};
   };
   "/payments": {
     params: {};
+  };
+  "/attendance": {
+    params: {};
+  };
+  "/zombies": {
+    params: {};
+  };
+  "/feedback": {
+    params: {};
+  };
+  "/gallery": {
+    params: {};
+  };
+  "/join/:qrToken": {
+    params: {
+      "qrToken": string;
+    };
+  };
+  "/staff-apply/:qrToken": {
+    params: {
+      "qrToken": string;
+    };
   };
   "/*": {
     params: {
@@ -56,7 +89,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/members" | "/members/:id" | "/staff" | "/plans" | "/payments" | "/*";
+    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/join/:qrToken" | "/staff-apply/:qrToken" | "/*";
   };
   "routes/logout.tsx": {
     id: "routes/logout";
@@ -64,7 +97,7 @@ type RouteFiles = {
   };
   "routes/_auth.tsx": {
     id: "routes/_auth";
-    page: "/signup" | "/login" | "/verify" | "/onboarding";
+    page: "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password";
   };
   "routes/_auth.signup.tsx": {
     id: "routes/_auth.signup";
@@ -82,9 +115,17 @@ type RouteFiles = {
     id: "routes/_auth.onboarding";
     page: "/onboarding";
   };
+  "routes/_auth.forgot-password.tsx": {
+    id: "routes/_auth.forgot-password";
+    page: "/forgot-password";
+  };
+  "routes/_auth.reset-password.tsx": {
+    id: "routes/_auth.reset-password";
+    page: "/reset-password";
+  };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/" | "/members" | "/members/:id" | "/staff" | "/plans" | "/payments";
+    page: "/" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery";
   };
   "routes/_app._index.tsx": {
     id: "routes/_app._index";
@@ -102,6 +143,10 @@ type RouteFiles = {
     id: "routes/_app.staff";
     page: "/staff";
   };
+  "routes/_app.staff.$id.tsx": {
+    id: "routes/_app.staff.$id";
+    page: "/staff/:id";
+  };
   "routes/_app.plans.tsx": {
     id: "routes/_app.plans";
     page: "/plans";
@@ -109,6 +154,30 @@ type RouteFiles = {
   "routes/_app.payments.tsx": {
     id: "routes/_app.payments";
     page: "/payments";
+  };
+  "routes/_app.attendance.tsx": {
+    id: "routes/_app.attendance";
+    page: "/attendance";
+  };
+  "routes/_app.zombies.tsx": {
+    id: "routes/_app.zombies";
+    page: "/zombies";
+  };
+  "routes/_app.feedback.tsx": {
+    id: "routes/_app.feedback";
+    page: "/feedback";
+  };
+  "routes/_app.gallery.tsx": {
+    id: "routes/_app.gallery";
+    page: "/gallery";
+  };
+  "routes/join.$qrToken.tsx": {
+    id: "routes/join.$qrToken";
+    page: "/join/:qrToken";
+  };
+  "routes/staff-apply.$qrToken.tsx": {
+    id: "routes/staff-apply.$qrToken";
+    page: "/staff-apply/:qrToken";
   };
   "routes/$.tsx": {
     id: "routes/$";
@@ -124,12 +193,21 @@ type RouteModules = {
   "routes/_auth.login": typeof import("./app/routes/_auth.login.tsx");
   "routes/_auth.verify": typeof import("./app/routes/_auth.verify.tsx");
   "routes/_auth.onboarding": typeof import("./app/routes/_auth.onboarding.tsx");
+  "routes/_auth.forgot-password": typeof import("./app/routes/_auth.forgot-password.tsx");
+  "routes/_auth.reset-password": typeof import("./app/routes/_auth.reset-password.tsx");
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app._index": typeof import("./app/routes/_app._index.tsx");
   "routes/_app.members": typeof import("./app/routes/_app.members.tsx");
   "routes/_app.members.$id": typeof import("./app/routes/_app.members.$id.tsx");
   "routes/_app.staff": typeof import("./app/routes/_app.staff.tsx");
+  "routes/_app.staff.$id": typeof import("./app/routes/_app.staff.$id.tsx");
   "routes/_app.plans": typeof import("./app/routes/_app.plans.tsx");
   "routes/_app.payments": typeof import("./app/routes/_app.payments.tsx");
+  "routes/_app.attendance": typeof import("./app/routes/_app.attendance.tsx");
+  "routes/_app.zombies": typeof import("./app/routes/_app.zombies.tsx");
+  "routes/_app.feedback": typeof import("./app/routes/_app.feedback.tsx");
+  "routes/_app.gallery": typeof import("./app/routes/_app.gallery.tsx");
+  "routes/join.$qrToken": typeof import("./app/routes/join.$qrToken.tsx");
+  "routes/staff-apply.$qrToken": typeof import("./app/routes/staff-apply.$qrToken.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
 };

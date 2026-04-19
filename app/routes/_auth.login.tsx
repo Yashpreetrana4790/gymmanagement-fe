@@ -28,7 +28,8 @@ export async function action({ request }: Route.ActionArgs) {
   const result = await api.post<{
     token: string;
     stage: string;
-    user: { firstName: string; email: string };
+    staffRole?: string;
+    user: { firstName: string; email: string; role: string };
   }>("/api/auth/login", parsed.data);
 
   if (!result.success) {
@@ -36,10 +37,12 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const session = await getSession(request);
-  session.set("token", result.token!);
-  session.set("stage", result.stage as "registered" | "verified" | "onboarded");
-  session.set("email", result.user!.email);
+  session.set("token",     result.token!);
+  session.set("stage",     result.stage as "registered" | "verified" | "onboarded");
+  session.set("email",     result.user!.email);
   session.set("firstName", result.user!.firstName);
+  session.set("role",      (result.user!.role ?? "member") as "admin" | "staff" | "member");
+  session.set("staffRole", result.staffRole ?? "");
 
   const destination =
     result.stage === "registered" ? "/verify"
@@ -75,7 +78,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
           Secure · Encrypted · Private
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-500">Sign in to your GymManager account</p>
+        <p className="mt-1 text-sm text-slate-500">Sign in to your Gravity Gym account</p>
       </div>
 
       <Form method="post" className="space-y-4">
@@ -97,6 +100,12 @@ export default function Login({ actionData }: Route.ComponentProps) {
             placeholder="Enter your password"
             className={`auth-input ${fields?.password ? "!border-red-400" : ""}`} />
           <FieldError msg={fields?.password} />
+        </div>
+
+        <div className="flex justify-end -mt-1">
+          <Link to="/forgot-password" className="text-xs font-semibold text-orange-600 hover:text-orange-500 transition-colors">
+            Forgot password?
+          </Link>
         </div>
 
         <button
