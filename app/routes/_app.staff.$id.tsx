@@ -73,9 +73,9 @@ const ROLES_WITH_PORTAL = ["trainer", "manager", "receptionist"];
 
 function Card({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
-        <span className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-200">
+        <span className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
           {icon}
         </span>
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
@@ -133,28 +133,36 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
     : s.schedule?.shiftStart ? `${s.schedule.shiftStart}–${s.schedule.shiftEnd}` : "Custom shift";
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full bg-gray-50 text-gray-900">
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-8 py-5">
-        <div className="flex items-center gap-3 mb-1">
-          <button onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Staff
-          </button>
-          <span className="text-gray-200">/</span>
-          <span className="text-sm text-gray-700 font-medium capitalize">{s.firstName} {s.lastName}</span>
+      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 backdrop-blur-sm px-6 sm:px-8 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition shrink-0"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+            <span className="text-gray-300">/</span>
+            <span className="text-sm text-gray-800 font-medium truncate capitalize">{s.firstName} {s.lastName}</span>
+          </div>
+          <Link to="/staff" className="text-xs font-medium text-gray-500 hover:text-primary transition shrink-0">
+            All staff
+          </Link>
         </div>
       </div>
 
-      <div className="p-8 max-w-5xl mx-auto space-y-6">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-8 pb-16">
 
         {/* Credentials banner */}
         {isAdmin && hasPortal && s.tempPassword && (
-          <div className="rounded-2xl border border-amber-200 overflow-hidden" style={{ background: "linear-gradient(135deg,#fffbeb,#fefce8)" }}>
+          <div className="rounded-2xl border border-amber-200 overflow-hidden bg-gradient-to-br from-amber-50 to-yellow-50 shadow-sm">
             <div className="flex items-center gap-3 px-5 py-3 border-b border-amber-200">
               <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
@@ -182,20 +190,23 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
         )}
 
         {/* Profile hero card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Gradient banner */}
-          <div className="h-24 w-full" style={{
-            background: `linear-gradient(135deg, ${cfg.bannerA} 0%, ${cfg.bannerB} 100%)`,
-          }} />
+          <div
+            className="h-28 sm:h-32 w-full relative"
+            style={{ background: `linear-gradient(135deg, ${cfg.bannerA} 0%, ${cfg.bannerB} 100%)` }}
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/30 via-transparent to-transparent" />
+          </div>
 
-          <div className="px-6 pb-6">
+          <div className="px-6 sm:px-8 pb-8 -mt-10 relative">
             {/* Avatar + badges */}
-            <div className="-mt-10 mb-4 flex items-end justify-between">
-              <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-2xl font-black select-none"
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-3xl font-black select-none shrink-0"
                 style={{ background: `linear-gradient(135deg,${cfg.bannerA},${cfg.bannerB})`, color: cfg.lightText }}>
                 {initials}
               </div>
-              <div className="flex items-center gap-2 pb-1">
+              <div className="flex flex-wrap items-center gap-2 pb-1">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
                   s.isActive ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-600 border-red-100"
                 }`}>
@@ -209,19 +220,19 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
             </div>
 
             {/* Name */}
-            <h1 className="text-2xl font-black text-gray-900 capitalize">{s.firstName} {s.lastName}</h1>
-            <p className="text-gray-400 text-sm mt-0.5">{s.email ?? s.phone}</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 capitalize tracking-tight">{s.firstName} {s.lastName}</h1>
+            <p className="text-gray-500 text-sm mt-0.5">{s.email ?? s.phone}</p>
 
             {/* Quick stats */}
-            <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="mt-7 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {[
                 { label: "Staff ID",    value: <span className="font-mono">{s.staffId ?? "—"}</span> },
                 { label: "Joined",      value: fmtDate(s.joiningDate) },
                 { label: "Employment",  value: <span className="capitalize">{s.employmentType}</span> },
                 { label: "Shift",       value: shiftLabel },
               ].map(stat => (
-                <div key={stat.label} className="bg-gray-50 rounded-xl p-3.5">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{stat.label}</p>
+                <div key={stat.label} className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{stat.label}</p>
                   <p className="text-sm font-bold mt-1 text-gray-900">{stat.value}</p>
                 </div>
               ))}
@@ -230,7 +241,7 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* Detail grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
           {/* Contact */}
           <Card title="Contact Info" icon={
@@ -364,9 +375,9 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* Back link */}
-        <div className="pb-4">
+        <div className="pt-2">
           <Link to="/staff"
-            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition font-medium">
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition font-medium">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

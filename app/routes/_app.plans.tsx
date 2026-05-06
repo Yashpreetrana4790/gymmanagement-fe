@@ -353,13 +353,15 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
     : null;
 
   return (
-    <div className="min-h-full">
-      <div className="bg-white border-b border-gray-100 px-8 py-5">
-        <h1 className="text-xl font-bold text-gray-900">Plans</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Manage membership plans for your gym.</p>
+    <div className="min-h-full bg-gray-50 text-gray-900">
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 px-6 sm:px-8 py-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-xl font-bold text-gray-900">Plans</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Manage membership plans for your gym.</p>
+        </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto pb-16">
         {(actionData as any)?.error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
             {(actionData as any).error}
@@ -369,7 +371,7 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
         {/* Plan cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
           {plans.length === 0 ? (
-            <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-gray-400">
+            <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center justify-center py-20 text-gray-400">
               <svg className="w-14 h-14 mb-4 opacity-25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -379,7 +381,7 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
             </div>
           ) : (
             plans.map((plan) => (
-              <div key={plan._id} className="rounded-2xl border-2 border-gray-200 bg-white p-6">
+              <div key={plan._id} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
                   <p className="text-2xl font-bold text-gray-900">₹{plan.price.toLocaleString("en-IN")}</p>
@@ -417,7 +419,7 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
         </div>
 
         {/* Create plan form */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-5">Create new plan</h2>
           <Form method="post" className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <input type="hidden" name="intent" value="create" />

@@ -69,6 +69,12 @@ type Pages = {
   "/gallery": {
     params: {};
   };
+  "/gym": {
+    params: {};
+  };
+  "/trainees": {
+    params: {};
+  };
   "/api/theme": {
     params: {};
   };
@@ -92,7 +98,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/api/theme" | "/join/:qrToken" | "/staff-apply/:qrToken" | "/*";
+    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/gym" | "/trainees" | "/api/theme" | "/join/:qrToken" | "/staff-apply/:qrToken" | "/*";
   };
   "routes/logout.tsx": {
     id: "routes/logout";
@@ -128,7 +134,7 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery";
+    page: "/" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/gym" | "/trainees";
   };
   "routes/_app._index.tsx": {
     id: "routes/_app._index";
@@ -174,6 +180,14 @@ type RouteFiles = {
     id: "routes/_app.gallery";
     page: "/gallery";
   };
+  "routes/_app.gym.tsx": {
+    id: "routes/_app.gym";
+    page: "/gym";
+  };
+  "routes/_app.trainees.tsx": {
+    id: "routes/_app.trainees";
+    page: "/trainees";
+  };
   "routes/api.theme.ts": {
     id: "routes/api.theme";
     page: "/api/theme";
@@ -214,6 +228,8 @@ type RouteModules = {
   "routes/_app.zombies": typeof import("./app/routes/_app.zombies.tsx");
   "routes/_app.feedback": typeof import("./app/routes/_app.feedback.tsx");
   "routes/_app.gallery": typeof import("./app/routes/_app.gallery.tsx");
+  "routes/_app.gym": typeof import("./app/routes/_app.gym.tsx");
+  "routes/_app.trainees": typeof import("./app/routes/_app.trainees.tsx");
   "routes/api.theme": typeof import("./app/routes/api.theme.ts");
   "routes/join.$qrToken": typeof import("./app/routes/join.$qrToken.tsx");
   "routes/staff-apply.$qrToken": typeof import("./app/routes/staff-apply.$qrToken.tsx");

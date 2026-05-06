@@ -142,6 +142,19 @@ export const staffSchema = z.object({
   shiftEnd:       z.string().optional().or(z.literal("")),
 });
 
+// ─── Payment ──────────────────────────────────────────────────────────────────
+
+export const paymentSchema = z.object({
+  memberId: z.string().min(1, "Select a member."),
+  planId:   z.string().min(1, "Select a plan."),
+  amount:   z.coerce.number({ invalid_type_error: "Amount must be a number." }).min(1, "Amount must be at least 1."),
+  method:   z.enum(["cash", "card", "upi", "bank_transfer", "cheque"], {
+    errorMap: () => ({ message: "Select a payment method." }),
+  }),
+  date:     z.string().optional().or(z.literal("")),
+  note:     z.string().optional().or(z.literal("")),
+});
+
 // ─── Helper — flatten ZodError into field → message map ──────────────────────
 
 export type FieldErrors = Record<string, string>;

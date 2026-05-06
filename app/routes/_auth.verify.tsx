@@ -86,7 +86,7 @@ function OtpBoxes({ value, onChange }: { value: string; onChange: (v: string) =>
   };
 
   return (
-    <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+    <div className="flex gap-2 justify-center">
       {digits.map((d, i) => (
         <input
           key={i}
@@ -101,33 +101,11 @@ function OtpBoxes({ value, onChange }: { value: string; onChange: (v: string) =>
           onKeyDown={(e) => handleKey(i, e)}
           onPaste={handlePaste}
           onFocus={(e) => e.target.select()}
-          className="otp-digit"
-          style={{
-            width: 48,
-            height: 56,
-            flexShrink: 0,
-            textAlign: "center",
-            fontSize: 22,
-            fontWeight: 800,
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
-            borderRadius: 12,
-            border: `2px solid ${d ? "#f97316" : "#e2e8f0"}`,
-            background: d ? "rgba(249,115,22,0.06)" : "#f8fafc",
-            outline: "none",
-            color: "#0f172a",
-            caretColor: "transparent",
-            transition: "all 0.15s ease",
-          }}
+          className={`w-12 h-14 shrink-0 text-center text-xl font-extrabold rounded-xl border-2 outline-none caret-transparent transition focus:ring-4 focus:ring-primary/20 focus:border-primary focus:scale-[1.04] ${
+            d ? "border-primary bg-primary/5 text-gray-900" : "border-gray-300 bg-gray-50 text-gray-900"
+          }`}
         />
       ))}
-      <style>{`
-        .otp-digit:focus {
-          border-color: #f97316 !important;
-          background: #fff !important;
-          box-shadow: 0 0 0 4px rgba(249,115,22,0.12) !important;
-          transform: scale(1.04);
-        }
-      `}</style>
     </div>
   );
 }
@@ -160,16 +138,15 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
 
       {/* ── Header ── */}
       <div className="mb-8">
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
-          style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.18)" }}>
-          <svg className="w-6 h-6" style={{ color: "#f97316" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 bg-primary/10 border border-primary/20">
+          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
 
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Check your email</h1>
-        <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
+        <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">
           We sent a 6-digit code to{" "}
           <span className="font-semibold text-gray-800">{email}</span>
         </p>
@@ -177,8 +154,7 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
 
       {/* ── Alerts ── */}
       {actionData?.resent && (
-        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#15803d" }}>
+        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
@@ -186,8 +162,7 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
         </div>
       )}
       {actionData?.error && (
-        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
+        <div className="mb-5 p-3 rounded-xl text-sm flex items-center gap-2 bg-red-50 border border-red-200 text-red-600">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -201,35 +176,28 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
         <input type="hidden" name="code" value={code} />
 
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
             Enter 6-digit code
           </p>
           <OtpBoxes value={code} onChange={setCode} />
         </div>
 
         {/* Progress dots */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
+        <div className="flex justify-center gap-1.5">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} style={{
-              width: 6, height: 6, borderRadius: "50%",
-              background: i < code.replace(/[^0-9]/g, "").length ? "#f97316" : "#e2e8f0",
-              transition: "background 0.2s",
-            }} />
+            <div
+              key={i}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                i < code.replace(/[^0-9]/g, "").length ? "bg-primary" : "bg-gray-300"
+              }`}
+            />
           ))}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting || !filled}
-          className="w-full py-3.5 px-4 font-bold rounded-xl text-sm text-white flex items-center justify-center gap-2 transition-all duration-200"
-          style={{
-            background: filled && !isSubmitting
-              ? "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)"
-              : "rgba(249,115,22,0.25)",
-            boxShadow: filled && !isSubmitting ? "0 4px 15px rgba(249,115,22,0.4), 0 2px 6px rgba(0,0,0,0.1)" : "none",
-            cursor: filled && !isSubmitting ? "pointer" : "not-allowed",
-            opacity: filled && !isSubmitting ? 1 : 0.6,
-          }}
+          className="w-full py-3.5 px-4 font-bold rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 transition"
         >
           {isSubmitting ? (
             <>
@@ -251,14 +219,14 @@ export default function Verify({ loaderData, actionData }: Route.ComponentProps)
       </Form>
 
       {/* ── Resend ── */}
-      <p className="mt-6 text-center text-sm text-slate-400">
+      <p className="mt-6 text-center text-sm text-gray-500">
         Didn't receive it?{" "}
         <Form method="post" className="inline">
           <input type="hidden" name="intent" value="resend" />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="font-semibold text-orange-600 hover:text-orange-500 transition-colors disabled:opacity-40"
+            className="font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-40"
           >
             Resend code
           </button>

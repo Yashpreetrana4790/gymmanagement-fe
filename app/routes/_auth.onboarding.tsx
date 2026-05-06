@@ -58,7 +58,7 @@ export async function action({ request }: Route.ActionArgs) {
 function Field({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-semibold mb-1.5 uppercase tracking-widest text-slate-500">
+      <label className="block text-xs font-semibold mb-1.5 uppercase tracking-widest text-gray-500">
         {label}
       </label>
       {children}
@@ -80,36 +80,28 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
 
   const fields = (actionData as any)?.fields as FieldErrors | null;
   const error  = (actionData as any)?.error  as string | null;
+  const inputCls = "w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
 
   const err = (name: string) => fields?.[name];
-  const invalid = (name: string) => (err(name) ? "!border-red-400" : "");
+  const invalid = (name: string) => (err(name) ? "border-red-400!" : "");
 
   return (
     <div className="flex-1">
       <div className="mb-5">
-        <div
-          className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
-          style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#b45309" }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "#f59e0b" }} />
+        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold bg-primary/10 border border-primary/20 text-primary">
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block bg-primary" />
           Step 3 of 3 — Final step
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Set Up Your Gym</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-gray-500">
           Great work, <span className="text-gray-800 font-semibold">{firstName}</span>! Tell us about your gym.
         </p>
       </div>
 
-      <div
-        className="mb-4 h-px w-full"
-        style={{ background: "linear-gradient(90deg, transparent, #fde68a, #fed7aa, transparent)" }}
-      />
+      <div className="mb-4 h-px w-full bg-linear-to-r from-transparent via-primary/20 to-transparent" />
 
       {error && (
-        <div
-          className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}
-        >
+        <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2 bg-red-50 border border-red-200 text-red-600">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -122,12 +114,12 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
         <div className="grid grid-cols-2 gap-3">
           <Field label={<>Gym Name<span className="text-red-500 ml-0.5">*</span></>}>
             <input name="gymName" type="text" placeholder="Iron Paradise Gym"
-              className={`auth-input ${invalid("gymName")}`} />
+              className={`${inputCls} ${invalid("gymName")}`} />
             <FieldError msg={err("gymName")} />
           </Field>
           <Field label={<>Capacity (members)<span className="text-red-500 ml-0.5">*</span></>}>
             <input name="strength" type="number" min={1} placeholder="200"
-              className={`auth-input ${invalid("strength")}`} />
+              className={`${inputCls} ${invalid("strength")}`} />
             <FieldError msg={err("strength")} />
           </Field>
         </div>
@@ -135,51 +127,43 @@ export default function Onboarding({ loaderData, actionData }: Route.ComponentPr
         <div className="grid grid-cols-2 gap-3">
           <Field label={<>City<span className="text-red-500 ml-0.5">*</span></>}>
             <input name="city" type="text" placeholder="Mumbai"
-              className={`auth-input ${invalid("city")}`} />
+              className={`${inputCls} ${invalid("city")}`} />
             <FieldError msg={err("city")} />
           </Field>
           <Field label="State">
             <input name="state" type="text" placeholder="Maharashtra"
-              className="auth-input" />
+              className={inputCls} />
           </Field>
         </div>
 
         <Field label="Full Address">
           <input name="address" type="text" placeholder="123, Main Street, Andheri West"
-            className="auth-input" />
+            className={inputCls} />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Pincode">
             <input name="pincode" type="text" placeholder="400053"
-              className={`auth-input ${invalid("pincode")}`} />
+              className={`${inputCls} ${invalid("pincode")}`} />
             <FieldError msg={err("pincode")} />
           </Field>
           <Field label="Gym Contact">
             <input name="phone" type="tel" placeholder="+91 98765 43210"
-              className={`auth-input ${invalid("phone")}`} />
+              className={`${inputCls} ${invalid("phone")}`} />
             <FieldError msg={err("phone")} />
           </Field>
         </div>
 
         <Field label="Gym Email">
           <input name="email" type="email" placeholder="gym@example.com"
-            className={`auth-input ${invalid("email")}`} />
+            className={`${inputCls} ${invalid("email")}`} />
           <FieldError msg={err("email")} />
         </Field>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 font-bold rounded-xl text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 mt-1"
-          style={{
-            background: isSubmitting
-              ? "rgba(245,158,11,0.6)"
-              : "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)",
-            boxShadow: isSubmitting ? "none" : "0 4px 14px rgba(245,158,11,0.3)",
-            opacity: isSubmitting ? 0.8 : 1,
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
+          className="w-full py-3 px-4 font-bold rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition flex items-center justify-center gap-2 mt-1"
         >
           {isSubmitting ? (
             <>

@@ -176,13 +176,12 @@ function IslandIllustration() {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden"
-      style={{ background: "linear-gradient(135deg,#050d1a 0%,#0a1628 45%,#071a20 100%)" }}>
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-gray-50 text-gray-900">
 
       {/* ── Ambient glows ── */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-3xl opacity-10"
-          style={{ background: "radial-gradient(circle,#f97316,transparent)" }}/>
+          style={{ background: "radial-gradient(circle,var(--primary),transparent)" }}/>
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-8"
           style={{ background: "radial-gradient(circle,#0d9488,transparent)" }}/>
         <div className="absolute top-1/2 left-0 w-72 h-72 rounded-full blur-3xl opacity-6"
@@ -201,7 +200,7 @@ export default function NotFound() {
                 d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </div>
-          <span className="text-sm font-bold text-white/60 tracking-widest uppercase">Gravity Gym</span>
+          <span className="text-sm font-bold text-gray-500 tracking-widest uppercase">Gravity Gym</span>
         </div>
 
         {/* 404 */}
@@ -224,7 +223,7 @@ export default function NotFound() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-[clamp(26px,4vw,42px)] font-black text-white leading-tight tracking-tight mb-4">
+        <h1 className="text-[clamp(26px,4vw,42px)] font-black text-gray-900 leading-tight tracking-tight mb-4">
           Stranded on a<br/>
           <span style={{
             background: "linear-gradient(90deg,#f59e0b,#f97316)",
@@ -237,7 +236,7 @@ export default function NotFound() {
         </h1>
 
         {/* Description */}
-        <p className="text-slate-400 text-base leading-relaxed max-w-sm mb-10">
+        <p className="text-gray-500 text-base leading-relaxed max-w-sm mb-10">
           The page you're looking for doesn't exist or has been moved. Let's get you back to dry land.
         </p>
 
@@ -258,13 +257,7 @@ export default function NotFound() {
           </Link>
 
           <Link to="/members"
-            className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 hover:-translate-y-0.5"
-            style={{
-              color: "rgba(255,255,255,0.75)",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              backdropFilter: "blur(8px)",
-            }}
+            className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl text-sm font-bold border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 transition-all duration-200 hover:-translate-y-0.5"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -276,9 +269,9 @@ export default function NotFound() {
 
         {/* Divider + nav hint */}
         <div className="mt-12 flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/6"/>
-          <span className="text-xs text-white/20 tracking-widest uppercase">Error 404</span>
-          <div className="h-px flex-1 bg-white/6"/>
+          <div className="h-px flex-1 bg-gray-200"/>
+          <span className="text-xs text-gray-400 tracking-widest uppercase">Error 404</span>
+          <div className="h-px flex-1 bg-gray-200"/>
         </div>
       </div>
 

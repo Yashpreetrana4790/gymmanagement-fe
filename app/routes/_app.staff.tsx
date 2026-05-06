@@ -392,17 +392,17 @@ function AddStaffModal({ open, onClose, isSubmitting, error, fields }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>First name <span className="text-red-500">*</span></Label>
-                <input name="firstName" type="text" placeholder="Arjun" className={`${inputCls} ${fields?.firstName ? "!border-red-400" : ""}`} />
+                <input name="firstName" type="text" placeholder="Arjun" className={`${inputCls} ${fields?.firstName ? "border-red-400!" : ""}`} />
                 <FieldError msg={fields?.firstName} />
               </div>
               <div>
                 <Label>Last name <span className="text-red-500">*</span></Label>
-                <input name="lastName" type="text" placeholder="Sharma" className={`${inputCls} ${fields?.lastName ? "!border-red-400" : ""}`} />
+                <input name="lastName" type="text" placeholder="Sharma" className={`${inputCls} ${fields?.lastName ? "border-red-400!" : ""}`} />
                 <FieldError msg={fields?.lastName} />
               </div>
               <div>
                 <Label>Phone <span className="text-red-500">*</span></Label>
-                <input name="phone" type="tel" placeholder="+91 98765 43210" className={`${inputCls} ${fields?.phone ? "!border-red-400" : ""}`} />
+                <input name="phone" type="tel" placeholder="+91 98765 43210" className={`${inputCls} ${fields?.phone ? "border-red-400!" : ""}`} />
                 <FieldError msg={fields?.phone} />
               </div>
               <div>
@@ -415,7 +415,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error, fields }: {
                 </Label>
                 <input
                   name="email" type="text" placeholder="arjun@gym.com"
-                  className={`${inputCls} ${fields?.email ? "!border-red-400" : ""}`}
+                  className={`${inputCls} ${fields?.email ? "border-red-400!" : ""}`}
                 />
                 {ROLES_WITH_PORTAL.includes(role as any) && !fields?.email && (
                   <p className="mt-1 text-xs text-primary font-medium">Required to create a portal login account</p>
@@ -424,7 +424,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error, fields }: {
               </div>
               <div>
                 <Label>Gender <span className="text-red-500">*</span></Label>
-                <select name="gender" className={`${selectCls} ${fields?.gender ? "!border-red-400" : ""}`}>
+                <select name="gender" className={`${selectCls} ${fields?.gender ? "border-red-400!" : ""}`}>
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -917,14 +917,15 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
   const createError = (actionData as any)?.intent === "create" ? (actionData as any)?.error : null;
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full bg-gray-50 text-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between">
-        <div>
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 px-6 sm:px-8 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div>
           <h1 className="text-xl font-bold text-gray-900">Staff</h1>
           <p className="text-sm text-gray-400 mt-0.5">{staff.length} total · {counts.active} active</p>
-        </div>
-        <div className="flex items-center gap-2">
+          </div>
+          <div className="flex items-center gap-2">
           <button
             onClick={() => setShowJoinQR(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
@@ -946,10 +947,11 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
               Add Staff
             </button>
           )}
+          </div>
         </div>
       </div>
 
-      <div className="p-8 space-y-5">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-5 pb-16">
         {/* Stat chips */}
         <div className="grid grid-cols-4 gap-4">
           {[

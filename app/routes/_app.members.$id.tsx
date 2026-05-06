@@ -261,7 +261,7 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${className}`}>
+    <div className={`rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden card-glass ${className}`}>
       <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-200">
         <span className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
           {icon}
@@ -278,7 +278,7 @@ function Row({ label, value }: { label: string; value?: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-gray-100 last:border-0">
       <span className="text-xs font-medium text-gray-400 uppercase tracking-wide w-36 shrink-0">{label}</span>
-      <span className="text-sm text-gray-800 font-medium text-right flex-1">{value}</span>
+      <span className="text-sm text-gray-700 font-medium text-right flex-1">{value}</span>
     </div>
   );
 }
@@ -518,7 +518,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
   return (
     <div className="min-h-full bg-gray-50 text-gray-900">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white/95 backdrop-blur-sm px-6 sm:px-8 py-4 sticky top-0 z-10">
+      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-sm px-6 sm:px-8 py-4 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -543,7 +543,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-8 pb-16">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-10 pb-16">
 
         {/* Profile hero */}
         <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
@@ -551,14 +551,15 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
             className="h-28 sm:h-32 w-full relative"
             style={{ background: "color-mix(in oklch, var(--primary) 20%, var(--background))" }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.24),transparent_42%)]" />
           </div>
 
           <div className="px-6 sm:px-8 pb-8 -mt-12 relative">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div className="flex items-end gap-4">
                 <div
-                  className="w-24 h-24 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-3xl font-black text-white shrink-0"
+                  className="w-24 h-24 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-3xl font-black text-white shrink-0 ring-4 ring-primary/10"
                   style={{ background: "var(--primary)" }}
                 >
                   {name[0]?.toUpperCase() ?? "?"}
@@ -613,7 +614,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                   value: member.goal?.primary ? GOAL_LABEL[member.goal.primary] ?? member.goal.primary : "—",
                 },
               ].map((s) => (
-                <div key={s.label} className="rounded-xl bg-gray-50 border border-gray-200 p-3.5">
+                <div key={s.label} className="rounded-xl bg-gray-50 border border-gray-200 p-3.5 hover:border-gray-300 transition">
                   <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{s.label}</p>
                   <p className={`text-sm font-bold mt-1 ${(s as { valueClass?: string }).valueClass ?? "text-gray-900"}`}>
                     {s.value}
@@ -731,7 +732,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-gray-500">Year</span>
-                <div className="flex rounded-xl border border-gray-300 bg-gray-50 p-0.5">
+                <div className="flex rounded-xl border border-gray-300 bg-gray-50 p-0.5 shadow-inner">
                   {yearOptions.map((y) => (
                     <button
                       key={y}
@@ -751,7 +752,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                 <button
                   type="submit"
                   disabled={visitFetcher.state !== "idle"}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 text-xs font-semibold text-gray-700 transition disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-xs font-semibold text-primary transition disabled:opacity-50"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -875,7 +876,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                 </svg>
               }
             >
-              <Row label="Plan" value={<span className="capitalize">{member.membershipType}</span>} />
+              <Row label="Plan" value={<span className="capitalize px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold">{member.membershipType}</span>} />
               <Row label="Start" value={formatDate(member.membershipStart)} />
               <Row
                 label="Expires"
@@ -973,6 +974,32 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
             </svg>
             Back to members
           </Link>
+        </div>
+        <div className="sticky bottom-4 z-10">
+          <div className="mx-auto w-fit rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-sm px-3 py-2 flex items-center gap-2">
+            <Link
+              to="/members"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm text-gray-600 hover:text-primary hover:bg-primary/10 transition font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to members
+            </Link>
+            <visitFetcher.Form method="post">
+              <input type="hidden" name="intent" value="checkin" />
+              <button
+                type="submit"
+                disabled={visitFetcher.state !== "idle"}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition disabled:opacity-50"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                {visitFetcher.state !== "idle" ? "Logging..." : "Quick check-in"}
+              </button>
+            </visitFetcher.Form>
+          </div>
         </div>
       </div>
     </div>

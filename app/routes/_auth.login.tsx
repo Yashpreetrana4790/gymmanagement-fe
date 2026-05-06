@@ -68,42 +68,42 @@ export default function Login({ actionData }: Route.ComponentProps) {
   useEffect(() => {
     if (error) toast("error", error);
   }, [error, actionData]);
+  const inputCls = "w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
 
   return (
     <div className="flex-1">
       <div className="mb-7">
-        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold"
-          style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", color: "#c2410c" }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: "#f97316" }} />
+        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-3 text-xs font-semibold bg-primary/10 border border-primary/20 text-primary">
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block bg-primary" />
           Secure · Encrypted · Private
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-500">Sign in to your Gravity Gym account</p>
+        <p className="mt-1 text-sm text-gray-500">Sign in to your Gravity Gym account</p>
       </div>
 
       <Form method="post" className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-semibold mb-1.5 text-slate-700">
+          <label htmlFor="email" className="block text-sm font-semibold mb-1.5 text-gray-700">
             Email Address <span className="text-red-500">*</span>
           </label>
           <input id="email" name="email" type="email" autoComplete="email"
             placeholder="you@yourgym.com"
-            className={`auth-input ${fields?.email ? "!border-red-400" : ""}`} />
+            className={`${inputCls} ${fields?.email ? "border-red-400!" : ""}`} />
           <FieldError msg={fields?.email} />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-semibold mb-1.5 text-slate-700">
+          <label htmlFor="password" className="block text-sm font-semibold mb-1.5 text-gray-700">
             Password <span className="text-red-500">*</span>
           </label>
           <input id="password" name="password" type="password" autoComplete="current-password"
             placeholder="Enter your password"
-            className={`auth-input ${fields?.password ? "!border-red-400" : ""}`} />
+            className={`${inputCls} ${fields?.password ? "border-red-400!" : ""}`} />
           <FieldError msg={fields?.password} />
         </div>
 
         <div className="flex justify-end -mt-1">
-          <Link to="/forgot-password" className="text-xs font-semibold text-orange-600 hover:text-orange-500 transition-colors">
+          <Link to="/forgot-password" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
             Forgot password?
           </Link>
         </div>
@@ -111,15 +111,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 font-bold rounded-xl text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 mt-1"
-          style={{
-            background: isSubmitting
-              ? "rgba(249,115,22,0.5)"
-              : "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%)",
-            boxShadow: isSubmitting ? "none" : "0 4px 15px rgba(249,115,22,0.4), 0 2px 6px rgba(0,0,0,0.1)",
-            opacity: isSubmitting ? 0.7 : 1,
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
+          className="w-full py-3 px-4 font-bold rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition flex items-center justify-center gap-2 mt-1"
         >
           {isSubmitting ? (
             <>
@@ -140,9 +132,9 @@ export default function Login({ actionData }: Route.ComponentProps) {
         </button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-gray-500">
         Don't have an account?{" "}
-        <Link to="/signup" className="font-semibold text-orange-600 hover:text-orange-500 transition-colors">
+        <Link to="/signup" className="font-semibold text-primary hover:text-primary/80 transition-colors">
           Create one free
         </Link>
       </p>

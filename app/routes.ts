@@ -27,6 +27,8 @@ export default [
     route("zombies", "routes/_app.zombies.tsx"),
     route("feedback", "routes/_app.feedback.tsx"),
     route("gallery", "routes/_app.gallery.tsx"),
+    route("gym", "routes/_app.gym.tsx"),
+    route("trainees", "routes/_app.trainees.tsx"),
   ]),
   // Theme API
   route("api/theme", "routes/api.theme.ts"),

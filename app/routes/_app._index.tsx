@@ -142,7 +142,7 @@ const ALL_QUICK_ACTIONS = [
     label: "Manage Staff",
     description: "Add trainers and front desk",
     href: "/staff",
-    accent: "bg-slate-700 text-white",
+    accent: "bg-gray-800 text-white",
     adminOnly: false,
     icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
   },
@@ -374,22 +374,24 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   );
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full bg-gray-50 text-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between">
-        <div>
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 px-6 sm:px-8 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div>
           <h1 className="text-xl font-bold text-gray-900">
             Good {getGreeting()}, {firstName}
           </h1>
           <p className="text-sm text-gray-400 mt-0.5" suppressHydrationWarning>{today}</p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+            System online
+          </span>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-          System online
-        </span>
       </div>
 
-      <div className="p-8 space-y-8">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-8 pb-16">
 
         {/* KPI Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">

@@ -1,4 +1,4 @@
-import { Form, Link, redirect, useNavigation, useActionData, useSearchParams } from "react-router";
+import { Form, Link, redirect, useNavigation, useActionData } from "react-router";
 import { useState } from "react";
 import type { Route } from "./+types/_auth.reset-password";
 
@@ -37,22 +37,20 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex-1">
       <div className="mb-8">
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
-          style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.18)" }}>
-          <svg className="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 bg-primary/10 border border-primary/20">
+          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Reset your password</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-gray-500">
           Enter the 6-digit code sent to <span className="font-semibold text-gray-700">{email}</span>
         </p>
       </div>
 
       {(actionData as any)?.error && (
-        <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
+        <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2 bg-red-50 border border-red-200 text-red-600">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -64,25 +62,25 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
         <input type="hidden" name="email" value={email} />
 
         <div>
-          <label className="block text-sm font-semibold mb-1.5 text-slate-700">
+          <label className="block text-sm font-semibold mb-1.5 text-gray-700">
             Reset code <span className="text-red-500">*</span>
           </label>
           <input
             name="code" type="text" required autoFocus
             maxLength={6} inputMode="numeric" placeholder="123456"
-            className="auth-input tracking-[0.4em] text-center font-mono text-lg"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition tracking-[0.4em] text-center font-mono text-lg"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-1.5 text-slate-700">
+          <label className="block text-sm font-semibold mb-1.5 text-gray-700">
             New password <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <input
               name="newPassword" type={showPw ? "text" : "password"} required
               minLength={6} placeholder="At least 6 characters"
-              className="auth-input pr-10"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition pr-10"
             />
             <button
               type="button"
@@ -98,24 +96,20 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-1.5 text-slate-700">
+          <label className="block text-sm font-semibold mb-1.5 text-gray-700">
             Confirm new password <span className="text-red-500">*</span>
           </label>
           <input
             name="confirm" type="password" required
             minLength={6} placeholder="Repeat password"
-            className="auth-input"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 font-bold rounded-xl text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 mt-1 disabled:opacity-60"
-          style={{
-            background: "linear-gradient(135deg,#f59e0b,#f97316,#ef4444)",
-            boxShadow: "0 4px 15px rgba(249,115,22,0.4)",
-          }}
+          className="w-full py-3 px-4 font-bold rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition flex items-center justify-center gap-2 mt-1 disabled:opacity-60"
         >
           {isSubmitting ? (
             <>
@@ -136,9 +130,9 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
         </button>
       </Form>
 
-      <p className="mt-5 text-center text-sm text-slate-500">
+      <p className="mt-5 text-center text-sm text-gray-500">
         Didn't get a code?{" "}
-        <Link to="/forgot-password" className="font-semibold text-orange-600 hover:text-orange-500 transition-colors">
+        <Link to="/forgot-password" className="font-semibold text-primary hover:text-primary/80 transition-colors">
           Resend
         </Link>
       </p>
