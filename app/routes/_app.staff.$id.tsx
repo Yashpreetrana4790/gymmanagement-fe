@@ -75,7 +75,7 @@ function Card({ title, icon, children }: { title: string; icon: React.ReactNode;
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
-        <span className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+        <span className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
           {icon}
         </span>
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
@@ -263,7 +263,7 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
                       key={d}
                       className={`flex-1 py-2 rounded-lg text-center border transition ${
                         active
-                          ? "bg-orange-500 border-orange-500"
+                          ? "bg-primary border-primary"
                           : "bg-gray-50 border-gray-200"
                       }`}
                     >
@@ -295,7 +295,7 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2.5">Specializations</p>
                 <div className="flex flex-wrap gap-1.5">
                   {s.specialization.map(sp => (
-                    <span key={sp} className="px-3 py-1 rounded-xl text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100">{sp}</span>
+                    <span key={sp} className="px-3 py-1 rounded-xl text-xs font-semibold bg-primary/10 text-primary border border-primary/20">{sp}</span>
                   ))}
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
           }>
             {qrDataUrl ? (
               <div className="flex items-center gap-5">
-                <div className="p-2.5 rounded-xl border-2 border-orange-100 bg-orange-50 shrink-0">
+                <div className="p-2.5 rounded-xl border-2 border-primary/20 bg-primary/5 shrink-0">
                   <img src={qrDataUrl} alt="Staff application QR" className="w-24 h-24" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -366,7 +366,7 @@ export default function StaffDetail({ loaderData }: Route.ComponentProps) {
         {/* Back link */}
         <div className="pb-4">
           <Link to="/staff"
-            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-orange-600 transition font-medium">
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition font-medium">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

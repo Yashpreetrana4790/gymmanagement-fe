@@ -225,14 +225,14 @@ export default function FeedbackPage({ loaderData }: Route.ComponentProps) {
         {/* Filters */}
         <form method="get" className="flex flex-wrap gap-3">
           <select name="status" defaultValue={filterStatus}
-            className="text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+            className="text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-ring">
             <option value="">All statuses</option>
             <option value="open">Open</option>
             <option value="in-progress">In progress</option>
             <option value="resolved">Resolved</option>
           </select>
           <select name="category" defaultValue={filterCategory}
-            className="text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+            className="text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-ring">
             <option value="">All categories</option>
             <option value="complaint">Complaint</option>
             <option value="suggestion">Suggestion</option>
@@ -240,7 +240,7 @@ export default function FeedbackPage({ loaderData }: Route.ComponentProps) {
             <option value="general">General</option>
           </select>
           <button type="submit"
-            className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition">
+            className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition">
             Filter
           </button>
         </form>

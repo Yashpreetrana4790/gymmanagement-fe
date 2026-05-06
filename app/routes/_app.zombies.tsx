@@ -36,7 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 const PLAN_BADGE: Record<string, string> = {
   premium:  "bg-amber-100 text-amber-700 border border-amber-200",
-  standard: "bg-orange-100 text-orange-700 border border-orange-200",
+  standard: "bg-primary/10 text-primary border border-primary/20",
   basic:    "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
@@ -45,7 +45,7 @@ function riskLevel(z: ZombieMember): { label: string; cls: string } {
   const d = z.daysSinceVisit ?? 0;
   if (d >= 60) return { label: `${d}d absent`, cls: "bg-red-100 text-red-700 border border-red-200" };
   if (d >= 30) return { label: `${d}d absent`, cls: "bg-amber-100 text-amber-700 border border-amber-200" };
-  return { label: `${d}d absent`, cls: "bg-orange-100 text-orange-700 border border-orange-200" };
+  return { label: `${d}d absent`, cls: "bg-primary/10 text-primary border border-primary/20" };
 }
 
 function formatDate(iso: string) {
@@ -106,7 +106,7 @@ export default function Zombies({ loaderData }: Route.ComponentProps) {
             { label: "Total zombies", value: total, color: "text-red-500", bg: "bg-red-50", border: "border-red-100" },
             { label: "Never visited", value: neverVisited, color: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
             { label: "Gone inactive", value: activeCount, color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-100" },
-            { label: "Longest absence", value: worstAbsence ? `${worstAbsence}d` : "—", color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100" },
+            { label: "Longest absence", value: worstAbsence ? `${worstAbsence}d` : "—", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
           ].map((s) => (
             <div key={s.label} className={`${s.bg} rounded-2xl border ${s.border} p-5 flex items-center gap-4`}>
               <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
@@ -188,7 +188,7 @@ export default function Zombies({ loaderData }: Route.ComponentProps) {
                         <td className="px-5 py-3.5">
                           <Link
                             to={`/members/${z._id}`}
-                            className="text-xs font-medium text-gray-500 hover:text-orange-600 transition px-2.5 py-1.5 rounded-lg hover:bg-orange-50"
+                            className="text-xs font-medium text-gray-500 hover:text-primary transition px-2.5 py-1.5 rounded-lg hover:bg-primary/10"
                           >
                             View
                           </Link>

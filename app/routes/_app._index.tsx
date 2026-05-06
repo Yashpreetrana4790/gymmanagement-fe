@@ -126,7 +126,7 @@ const ALL_QUICK_ACTIONS = [
     label: "Add Member",
     description: "Register a new gym member",
     href: "/members",
-    accent: "bg-orange-500 text-white",
+    accent: "bg-primary text-primary-foreground",
     adminOnly: false,
     icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>,
   },
@@ -180,7 +180,7 @@ function StatCard({
   const isDown = hasTrend && sub!.startsWith("-") && !sub!.startsWith("-0");
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 p-5 flex flex-col gap-4">
+    <div className="bg-card rounded-2xl border border-border shadow-sm card-glass p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg}`}>
           <span className={iconColor}>{icon}</span>
@@ -225,7 +225,7 @@ function QuickActionCard({
   return (
     <Link
       to={href}
-      className="group bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-start gap-4"
+      className="group bg-card rounded-2xl p-5 border border-border shadow-sm card-glass flex items-start gap-4"
     >
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent} group-hover:scale-110 transition-transform`}>
         {icon}
@@ -325,8 +325,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
       value: stats.activeTrainees,
       sub: stats.activeTrainees === 0 ? "No active memberships yet" : "Currently active",
       subColor: "text-gray-400",
-      iconBg: "bg-orange-50",
-      iconColor: "text-orange-500",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
       icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
     },
     {
@@ -400,11 +400,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 
         {/* Getting started banner */}
         {stats.totalMembers === 0 && (
-          <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-white rounded-2xl p-8 border border-orange-100">
+          <div className="relative overflow-hidden bg-linear-to-br from-primary/5 via-primary/10 to-background rounded-2xl p-8 border border-primary/20">
             <div className="absolute inset-0 opacity-10"
               style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #3b82f6 0%, transparent 50%)" }} />
             <div className="relative">
-              <div className="inline-flex items-center gap-2 bg-orange-100 border border-orange-200 rounded-full px-3 py-1 text-orange-700 text-xs font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 text-primary text-xs font-semibold mb-4">
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                 </svg>
@@ -416,11 +416,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link to="/plans"
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold px-5 py-2.5 rounded-xl transition">
                   Create first plan
                 </Link>
                 <Link to="/members"
-                  className="inline-flex items-center gap-2 bg-white hover:bg-orange-50 text-gray-800 text-sm font-semibold px-5 py-2.5 rounded-xl transition border border-orange-200">
+                  className="inline-flex items-center gap-2 bg-background hover:bg-primary/10 text-foreground text-sm font-semibold px-5 py-2.5 rounded-xl transition border border-primary/20">
                   Add a member
                 </Link>
               </div>
@@ -439,13 +439,13 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* Plan popularity */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-card rounded-2xl border border-border shadow-sm card-glass p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">Plan popularity</h2>
               <p className="text-xs text-gray-400 mt-0.5">Member distribution by membership type</p>
             </div>
-            <Link to="/plans" className="text-xs text-orange-500 hover:text-orange-600 font-medium">
+            <Link to="/plans" className="text-xs text-primary hover:text-primary/80 font-medium">
               Manage plans
             </Link>
           </div>
@@ -456,10 +456,10 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Recent members */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="lg:col-span-2 bg-card rounded-2xl border border-border shadow-sm card-glass overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Recent members</h2>
-              <Link to="/members" className="text-xs text-orange-500 hover:text-orange-600 font-medium">
+              <Link to="/members" className="text-xs text-primary hover:text-primary/80 font-medium">
                 View all
               </Link>
             </div>
@@ -477,7 +477,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
                             {m.name?.[0]?.toUpperCase() ?? "?"}
                           </div>
                           <span className="font-medium text-gray-800">{m.name}</span>
@@ -507,7 +507,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 </div>
                 <p className="text-sm font-medium text-gray-500">No members yet</p>
                 <Link to="/members"
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-orange-500 hover:text-orange-600">
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80">
                   Add member
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -521,7 +521,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           <div className="flex flex-col gap-4">
 
             {/* Birthdays widget */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm card-glass p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-lg">🎂</span>
                 <h3 className="text-sm font-semibold text-gray-900">Upcoming birthdays</h3>
@@ -566,7 +566,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             </div>
 
             {/* Expiring soon */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex-1">
+            <div className="bg-card rounded-2xl border border-border shadow-sm card-glass p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
                 <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

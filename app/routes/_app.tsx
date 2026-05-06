@@ -1,6 +1,8 @@
-import { Link, NavLink, Outlet, Form, redirect } from "react-router";
+import { Link, NavLink, Outlet, Form, redirect, useRouteLoaderData } from "react-router";
 import type { Route } from "./+types/_app";
 import { GravityLogo } from "~/components/GravityLogo";
+import { ThemeSwitcher } from "~/components/ThemeSwitcher";
+import type { AccentColor } from "~/components/ThemeSwitcher";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { requireSession } = await import("~/lib/session.server");
@@ -89,12 +91,15 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
   const isAdmin    = role === "admin";
   const roleLabel  = isAdmin ? "Admin" : ROLE_LABEL[staffRole] ?? "Staff";
 
+  const rootData = useRouteLoaderData("root") as { accent: AccentColor } | undefined;
+  const accent = rootData?.accent ?? "orange";
+
   const visibleNav = navItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-64 bg-sidebar border-r border-border flex flex-col">
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5">
           <div>
@@ -103,10 +108,10 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* Nav label */}
-        <p className="px-5 pt-2 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-widest">Menu</p>
+        <p className="px-5 pt-2 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Menu</p>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-0.5">
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {visibleNav.map((item) => (
             <NavLink
               key={item.to}
@@ -115,8 +120,8 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-orange-500 text-white shadow-sm"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-orange-50"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`
               }
             >
@@ -126,26 +131,26 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
           ))}
         </nav>
 
+        {/* Theme switcher */}
+        <div className="border-t border-border pt-3">
+          <ThemeSwitcher accent={accent} />
+        </div>
+
         {/* User card + logout */}
         <div className="p-3">
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+          <div className="bg-muted border border-border rounded-xl p-3">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
-                style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)" }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0 bg-primary">
                 {user?.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="text-gray-900 text-sm font-semibold truncate leading-none">
+                  <p className="text-foreground text-sm font-semibold truncate leading-none">
                     {user?.firstName} {user?.lastName}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${
-                    isAdmin
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-blue-100 text-blue-700"
-                  }`}>
+                  <span className="text-xs font-semibold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary">
                     {roleLabel}
                   </span>
                 </div>
@@ -154,7 +159,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
             <Form method="post" action="/logout">
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 text-gray-700 rounded-lg text-xs font-medium transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-3 py-1.5 bg-background hover:bg-accent border border-border text-foreground rounded-lg text-xs font-medium transition-colors"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -168,7 +173,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-background">
         <Outlet context={{ role, staffRole }} />
       </main>
     </div>

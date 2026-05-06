@@ -1,5 +1,6 @@
 import { Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/_auth.signup";
+import { signupSchema, parseErrors, type FieldErrors } from "~/lib/validations";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { redirectIfAuthenticated } = await import("~/lib/session.server");
@@ -11,35 +12,39 @@ export async function action({ request }: Route.ActionArgs) {
   const { getSession, commitSession } = await import("~/lib/session.server");
   const { api } = await import("~/lib/api.server");
   const form = await request.formData();
-  const data = {
-    firstName: form.get("firstName") as string,
-    lastName: form.get("lastName") as string,
-    email: form.get("email") as string,
-    phone: form.get("phone") as string,
-    password: form.get("password") as string,
-    confirmPassword: form.get("confirmPassword") as string,
+
+  const raw = {
+    firstName:       (form.get("firstName")       as string) ?? "",
+    lastName:        (form.get("lastName")         as string) ?? "",
+    email:           (form.get("email")            as string) ?? "",
+    phone:           (form.get("phone")            as string) ?? "",
+    password:        (form.get("password")         as string) ?? "",
+    confirmPassword: (form.get("confirmPassword")  as string) ?? "",
   };
 
-  if (data.password !== data.confirmPassword) {
-    return { error: "Passwords do not match." };
-  }
-  if (data.password.length < 6) {
-    return { error: "Password must be at least 6 characters." };
+  const parsed = signupSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { fields: parseErrors(parsed.error) as FieldErrors, error: null };
   }
 
   const result = await api.post<{ token: string; stage: string; user: { firstName: string; email: string } }>(
     "/api/auth/register",
-    { firstName: data.firstName, lastName: data.lastName, email: data.email, phone: data.phone, password: data.password }
+    { firstName: parsed.data.firstName, lastName: parsed.data.lastName, email: parsed.data.email, phone: parsed.data.phone, password: parsed.data.password }
   );
 
   if (!result.success) {
-    return { error: result.message ?? "Registration failed." };
+    // If backend returned field-level errors, surface them; otherwise show the message
+    const backendErrors = (result as any).errors as Record<string, string> | undefined;
+    if (backendErrors && Object.keys(backendErrors).length > 0) {
+      return { fields: backendErrors as FieldErrors, error: null };
+    }
+    return { error: result.message ?? "Registration failed.", fields: null };
   }
 
   const session = await getSession(request);
-  session.set("token", result.token!);
-  session.set("stage", result.stage as "registered");
-  session.set("email", result.user!.email);
+  session.set("token",     result.token!);
+  session.set("stage",     result.stage as "registered");
+  session.set("email",     result.user!.email);
   session.set("firstName", result.user!.firstName);
 
   return redirect("/verify", {
@@ -47,17 +52,23 @@ export async function action({ request }: Route.ActionArgs) {
   });
 }
 
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
+}
+
 function Label({ children }: { children: React.ReactNode }) {
-  return (
-    <label className="block text-sm font-semibold mb-1.5 text-slate-700">
-      {children}
-    </label>
-  );
+  return <label className="block text-sm font-semibold mb-1.5 text-slate-700">{children}</label>;
 }
 
 export default function Signup({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const navigation   = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const fields = (actionData as any)?.fields as FieldErrors | null;
+  const error  = (actionData as any)?.error  as string | null;
+
+  const inputCls = (field: string) =>
+    `auth-input ${fields?.[field] ? "!border-red-400 focus:!ring-red-300" : ""}`;
 
   return (
     <div>
@@ -68,19 +79,17 @@ export default function Signup({ actionData }: Route.ComponentProps) {
           No credit card needed
         </div>
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Get Started Now</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Enter your details to create your account
-        </p>
+        <p className="mt-1 text-sm text-slate-500">Enter your details to create your account</p>
       </div>
 
-      {actionData?.error && (
+      {error && (
         <div className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2.5"
           style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626" }}>
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {actionData.error}
+          {error}
         </div>
       )}
 
@@ -88,38 +97,44 @@ export default function Signup({ actionData }: Route.ComponentProps) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label>First Name <span className="text-red-400">*</span></Label>
-            <input name="firstName" required type="text" autoComplete="given-name"
-              placeholder="John" className="auth-input" />
+            <input name="firstName" type="text" autoComplete="given-name"
+              placeholder="John" className={inputCls("firstName")} />
+            <FieldError msg={fields?.firstName} />
           </div>
           <div>
             <Label>Last Name</Label>
             <input name="lastName" type="text" autoComplete="family-name"
-              placeholder="Doe" className="auth-input" />
+              placeholder="Doe" className={inputCls("lastName")} />
+            <FieldError msg={fields?.lastName} />
           </div>
         </div>
 
         <div>
-          <Label>Phone Number <span className="text-red-500">*</span></Label>
-          <input name="phone" required type="tel" autoComplete="tel"
-            placeholder="+91 98765 43210" className="auth-input" />
+          <Label>Phone Number</Label>
+          <input name="phone" type="tel" autoComplete="tel"
+            placeholder="+91 98765 43210" className={inputCls("phone")} />
+          <FieldError msg={fields?.phone} />
         </div>
 
         <div>
           <Label>Email Address <span className="text-red-400">*</span></Label>
-          <input name="email" required type="email" autoComplete="email"
-            placeholder="john@gmail.com" className="auth-input" />
+          <input name="email" type="email" autoComplete="email"
+            placeholder="john@gmail.com" className={inputCls("email")} />
+          <FieldError msg={fields?.email} />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label>Password <span className="text-red-400">*</span></Label>
-            <input name="password" required type="password" autoComplete="new-password"
-              placeholder="Min. 6 chars" className="auth-input" />
+            <input name="password" type="password" autoComplete="new-password"
+              placeholder="Min. 6 chars" className={inputCls("password")} />
+            <FieldError msg={fields?.password} />
           </div>
           <div>
             <Label>Confirm Password <span className="text-red-400">*</span></Label>
-            <input name="confirmPassword" required type="password" autoComplete="new-password"
-              placeholder="Re-enter" className="auth-input" />
+            <input name="confirmPassword" type="password" autoComplete="new-password"
+              placeholder="Re-enter" className={inputCls("confirmPassword")} />
+            <FieldError msg={fields?.confirmPassword} />
           </div>
         </div>
 

@@ -69,6 +69,9 @@ type Pages = {
   "/gallery": {
     params: {};
   };
+  "/api/theme": {
+    params: {};
+  };
   "/join/:qrToken": {
     params: {
       "qrToken": string;
@@ -89,7 +92,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/join/:qrToken" | "/staff-apply/:qrToken" | "/*";
+    page: "/" | "/logout" | "/signup" | "/login" | "/verify" | "/onboarding" | "/forgot-password" | "/reset-password" | "/members" | "/members/:id" | "/staff" | "/staff/:id" | "/plans" | "/payments" | "/attendance" | "/zombies" | "/feedback" | "/gallery" | "/api/theme" | "/join/:qrToken" | "/staff-apply/:qrToken" | "/*";
   };
   "routes/logout.tsx": {
     id: "routes/logout";
@@ -171,6 +174,10 @@ type RouteFiles = {
     id: "routes/_app.gallery";
     page: "/gallery";
   };
+  "routes/api.theme.ts": {
+    id: "routes/api.theme";
+    page: "/api/theme";
+  };
   "routes/join.$qrToken.tsx": {
     id: "routes/join.$qrToken";
     page: "/join/:qrToken";
@@ -207,6 +214,7 @@ type RouteModules = {
   "routes/_app.zombies": typeof import("./app/routes/_app.zombies.tsx");
   "routes/_app.feedback": typeof import("./app/routes/_app.feedback.tsx");
   "routes/_app.gallery": typeof import("./app/routes/_app.gallery.tsx");
+  "routes/api.theme": typeof import("./app/routes/api.theme.ts");
   "routes/join.$qrToken": typeof import("./app/routes/join.$qrToken.tsx");
   "routes/staff-apply.$qrToken": typeof import("./app/routes/staff-apply.$qrToken.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");

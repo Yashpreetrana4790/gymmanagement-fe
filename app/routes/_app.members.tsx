@@ -1,5 +1,6 @@
 import { Form, Link, useNavigation, useFetcher } from "react-router";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { memberSchema, parseErrors, type FieldErrors } from "~/lib/validations";
 import type { Route } from "./+types/_app.members";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -34,15 +35,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await requireSession(request);
   const token = session.get("token")!;
   const origin = new URL(request.url).origin;
-  const [membersResult, gymResult] = await Promise.all([
+  const [membersResult, gymResult, plansResult] = await Promise.all([
     api.get<{ data: Member[]; count: number }>("/api/members", token),
     api.get<{ data: { qrToken: string; gymName: string } }>("/api/gym-profile", token),
+    api.get<{ count: number }>("/api/plans", token),
   ]);
   const qrToken = gymResult.data?.qrToken ?? null;
   return {
     members: membersResult.data ?? [],
     joinUrl: qrToken ? `${origin}/join/${qrToken}` : null,
     gymName: gymResult.data?.gymName ?? "",
+    hasPlans: (plansResult.count ?? 0) > 0,
   };
 }
 
@@ -55,31 +58,43 @@ export async function action({ request }: Route.ActionArgs) {
   const intent = form.get("intent");
 
   if (intent === "create") {
-    const result = await api.post("/api/members", {
-      firstName:         form.get("firstName"),
-      lastName:          form.get("lastName"),
-      email:             form.get("email"),
-      phone:             form.get("phone"),
-      dateOfBirth:       form.get("dateOfBirth") || undefined,
-      membershipType:    form.get("membershipType"),
-      membershipEnd:     form.get("membershipEnd"),
-      height:            form.get("height"),
-      weight:            form.get("weight"),
-      bodyType:          form.get("bodyType"),
-      dietType:          form.get("dietType"),
-      allergies:         form.get("allergies"),
-      supplements:       form.get("supplements"),
-      primaryGoal:       form.get("primaryGoal"),
-      targetWeight:      form.get("targetWeight"),
-      goalNotes:         form.get("goalNotes"),
-      medicalConditions: form.get("medicalConditions"),
-      injuries:          form.get("injuries"),
-      healthNotes:       form.get("healthNotes"),
-      emergencyName:     form.get("emergencyName"),
-      emergencyPhone:    form.get("emergencyPhone"),
-      emergencyRelation: form.get("emergencyRelation"),
-    }, token);
-    return { intent: "create", success: result.success, error: result.success ? null : (result.message ?? "Failed to add member.") };
+    const raw = {
+      firstName:         (form.get("firstName")         as string) ?? "",
+      lastName:          (form.get("lastName")           as string) ?? "",
+      email:             (form.get("email")              as string) ?? "",
+      phone:             (form.get("phone")              as string) ?? "",
+      dateOfBirth:       (form.get("dateOfBirth")        as string) ?? "",
+      membershipType:    (form.get("membershipType")     as string) ?? "",
+      membershipEnd:     (form.get("membershipEnd")      as string) ?? "",
+      height:            (form.get("height")             as string) ?? "",
+      weight:            (form.get("weight")             as string) ?? "",
+      bodyType:          (form.get("bodyType")           as string) ?? "",
+      dietType:          (form.get("dietType")           as string) ?? "",
+      allergies:         (form.get("allergies")          as string) ?? "",
+      supplements:       (form.get("supplements")        as string) ?? "",
+      primaryGoal:       (form.get("primaryGoal")        as string) ?? "",
+      targetWeight:      (form.get("targetWeight")       as string) ?? "",
+      goalNotes:         (form.get("goalNotes")          as string) ?? "",
+      medicalConditions: (form.get("medicalConditions")  as string) ?? "",
+      injuries:          (form.get("injuries")           as string) ?? "",
+      healthNotes:       (form.get("healthNotes")        as string) ?? "",
+      emergencyName:     (form.get("emergencyName")      as string) ?? "",
+      emergencyPhone:    (form.get("emergencyPhone")     as string) ?? "",
+      emergencyRelation: (form.get("emergencyRelation")  as string) ?? "",
+    };
+
+    const parsed = memberSchema.safeParse(raw);
+    if (!parsed.success) {
+      return { intent: "create", success: false, fields: parseErrors(parsed.error) as FieldErrors, error: null };
+    }
+
+    const result = await api.post("/api/members", parsed.data, token);
+    return {
+      intent: "create",
+      success: result.success,
+      fields: null,
+      error: result.success ? null : (result.message ?? "Failed to add member."),
+    };
   }
 
   if (intent === "delete") {
@@ -99,25 +114,25 @@ function isExpired(dateStr: string) {
 
 const PLAN_BADGE: Record<string, string> = {
   premium:  "bg-amber-100 text-amber-700 border border-amber-200",
-  standard: "bg-orange-100 text-orange-700 border border-orange-200",
+  standard: "bg-primary/10 text-primary border border-primary/20",
   basic:    "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
 const inputCls =
-  "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition";
+  "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
 
 const selectCls =
-  "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition appearance-none";
+  "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition appearance-none";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return (
     <span className={`ml-1 inline-flex flex-col gap-px transition-opacity ${active ? "opacity-100" : "opacity-25"}`}>
-      <svg className={`w-2.5 h-2.5 ${active && dir === "asc" ? "text-orange-500" : "text-gray-400"}`} viewBox="0 0 10 6" fill="currentColor">
+      <svg className={`w-2.5 h-2.5 ${active && dir === "asc" ? "text-primary" : "text-gray-400"}`} viewBox="0 0 10 6" fill="currentColor">
         <path d="M5 0L10 6H0z" />
       </svg>
-      <svg className={`w-2.5 h-2.5 ${active && dir === "desc" ? "text-orange-500" : "text-gray-400"}`} viewBox="0 0 10 6" fill="currentColor">
+      <svg className={`w-2.5 h-2.5 ${active && dir === "desc" ? "text-primary" : "text-gray-400"}`} viewBox="0 0 10 6" fill="currentColor">
         <path d="M5 6L0 0H10z" />
       </svg>
     </span>
@@ -127,7 +142,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 function Section({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-2 mb-3 mt-1">
-      <span className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">{icon}</span>
+      <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{icon}</span>
       <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{title}</span>
       <div className="flex-1 h-px bg-gray-100" />
     </div>
@@ -164,12 +179,12 @@ function FilterSelect({ value, onChange, options }: {
         onClick={() => setOpen((o) => !o)}
         className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-sm font-medium transition whitespace-nowrap ${
           value !== options[0].value
-            ? "border-orange-300 bg-orange-50 text-orange-700"
+            ? "border-primary/30 bg-primary/10 text-primary"
             : "border-gray-200 bg-gray-50 text-gray-600 hover:bg-white hover:border-gray-300"
         }`}
       >
         {value !== options[0].value && (
-          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+          <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
         )}
         {selected.label}
         <svg className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -189,11 +204,11 @@ function FilterSelect({ value, onChange, options }: {
               onClick={() => { onChange(opt.value); setOpen(false); }}
               className={`w-full text-left px-4 py-2 text-sm font-medium transition flex items-center gap-2.5 ${
                 opt.value === value
-                  ? "bg-orange-50 text-orange-700"
+                  ? "bg-primary/10 text-primary"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${opt.value === value ? "bg-orange-400" : "bg-transparent"}`} />
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${opt.value === value ? "bg-primary" : "bg-transparent"}`} />
               {opt.label}
             </button>
           ))}
@@ -266,7 +281,7 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition flex items-center justify-between gap-2"
+        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition flex items-center justify-between gap-2"
         style={{ color: selected ? "#111827" : "#9ca3af" }}
       >
         <span>{displayVal || placeholder}</span>
@@ -319,15 +334,11 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
                   onClick={() => pick(date)}
                   className="h-8 w-full flex items-center justify-center rounded-xl text-xs transition-all"
                   style={{
-                    background: sel
-                      ? "linear-gradient(135deg,#f59e0b,#f97316)"
-                      : tod && !sel ? "rgba(249,115,22,0.08)" : "transparent",
-                    color: sel ? "#fff"
-                      : !cur || dis ? "#d1d5db"
-                      : tod ? "#f97316" : "#111827",
+                    background: sel ? "var(--primary)" : tod && !sel ? "color-mix(in oklch, var(--primary) 10%, transparent)" : "transparent",
+                    color: sel ? "var(--primary-foreground)" : !cur || dis ? "#d1d5db" : tod ? "var(--primary)" : "#111827",
                     fontWeight: sel || tod ? 700 : 400,
                     cursor: dis ? "not-allowed" : "pointer",
-                    outline: tod && !sel ? "1.5px solid #fed7aa" : "none",
+                    outline: tod && !sel ? "1.5px solid color-mix(in oklch, var(--primary) 40%, transparent)" : "none",
                     outlineOffset: "-1.5px",
                   }}
                 >
@@ -341,12 +352,12 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <button type="button"
               onClick={() => { setSelected(null); setOpen(false); }}
-              className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition">
+              className="text-xs font-semibold text-primary hover:text-primary/80 transition">
               Clear
             </button>
             <button type="button"
               onClick={() => pick(today)}
-              className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition">
+              className="text-xs font-semibold text-primary hover:text-primary/80 transition">
               Today
             </button>
           </div>
@@ -508,7 +519,7 @@ function QrModal({ open, onClose, joinUrl, gymName }: {
         </div>
 
         <div className="flex flex-col items-center px-6 py-6 gap-4">
-          <div className="p-4 rounded-2xl border-2 border-orange-100 bg-orange-50">
+          <div className="p-4 rounded-2xl border-2 border-primary/20 bg-primary/5">
             <canvas ref={canvasRef} />
           </div>
 
@@ -542,8 +553,7 @@ function QrModal({ open, onClose, joinUrl, gymName }: {
             <button
               type="button"
               onClick={downloadQr}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-xl text-white transition"
-              style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: "0 4px 12px rgba(249,115,22,0.35)" }}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-xl bg-primary text-primary-foreground transition"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -559,8 +569,14 @@ function QrModal({ open, onClose, joinUrl, gymName }: {
 
 // ─── Add Member Modal ─────────────────────────────────────────────────────────
 
-function AddMemberModal({ open, onClose, isSubmitting, error }: {
-  open: boolean; onClose: () => void; isSubmitting: boolean; error?: string | null;
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
+}
+
+function AddMemberModal({ open, onClose, isSubmitting, error, fields }: {
+  open: boolean; onClose: () => void; isSubmitting: boolean;
+  error?: string | null; fields?: FieldErrors | null;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const todayIso = useMemo(() => new Date().toISOString().split("T")[0], []);
@@ -602,17 +618,44 @@ function AddMemberModal({ open, onClose, isSubmitting, error }: {
 
             <Section title="Personal Info" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} />
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>First name <span className="text-red-500">*</span></Label><input name="firstName" required type="text" placeholder="John" className={inputCls} /></div>
-              <div><Label>Last name <span className="text-red-500">*</span></Label><input name="lastName" required type="text" placeholder="Doe" className={inputCls} /></div>
-              <div><Label>Email <span className="text-red-500">*</span></Label><input name="email" required type="email" placeholder="john@example.com" className={inputCls} /></div>
-              <div><Label>Phone</Label><input name="phone" type="tel" placeholder="+91 98765 43210" className={inputCls} /></div>
+              <div>
+                <Label>First name <span className="text-red-500">*</span></Label>
+                <input name="firstName" type="text" placeholder="John" className={`${inputCls} ${fields?.firstName ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.firstName} />
+              </div>
+              <div>
+                <Label>Last name</Label>
+                <input name="lastName" type="text" placeholder="Doe" className={inputCls} />
+              </div>
+              <div>
+                <Label>Email <span className="text-red-500">*</span></Label>
+                <input name="email" type="text" placeholder="john@example.com" className={`${inputCls} ${fields?.email ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.email} />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <input name="phone" type="tel" placeholder="+91 98765 43210" className={`${inputCls} ${fields?.phone ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.phone} />
+              </div>
               <div><Label>Date of birth</Label><DatePicker name="dateOfBirth" max={todayIso} placeholder="Pick date of birth" /></div>
             </div>
 
             <Section title="Membership" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>} />
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Plan</Label><select name="membershipType" className={selectCls}><option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option></select></div>
-              <div><Label>Expires on <span className="text-red-500">*</span></Label><DatePicker name="membershipEnd" min={todayIso} placeholder="Pick expiry date" /></div>
+              <div>
+                <Label>Plan <span className="text-red-500">*</span></Label>
+                <select name="membershipType" className={`${selectCls} ${fields?.membershipType ? "!border-red-400" : ""}`}>
+                  <option value="basic">Basic</option>
+                  <option value="standard">Standard</option>
+                  <option value="premium">Premium</option>
+                </select>
+                <FieldError msg={fields?.membershipType} />
+              </div>
+              <div>
+                <Label>Expires on <span className="text-red-500">*</span></Label>
+                <DatePicker name="membershipEnd" min={todayIso} placeholder="Pick expiry date" />
+                <FieldError msg={fields?.membershipEnd} />
+              </div>
             </div>
 
             <Section title="Body & Physique" icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>} />
@@ -658,8 +701,7 @@ function AddMemberModal({ open, onClose, isSubmitting, error }: {
             Cancel
           </button>
           <button type="submit" form="add-member-form" disabled={isSubmitting}
-            className="px-6 py-2.5 text-sm font-bold text-white rounded-xl transition-all flex items-center gap-2"
-            style={{ background: isSubmitting ? "rgba(249,115,22,0.5)" : "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: isSubmitting ? "none" : "0 4px 12px rgba(249,115,22,0.35)" }}>
+            className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${isSubmitting ? "bg-primary/50 text-primary-foreground" : "bg-primary text-primary-foreground"}`}>
             {isSubmitting ? (
               <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Adding…</>
             ) : "Add member"}
@@ -675,7 +717,7 @@ function AddMemberModal({ open, onClose, isSubmitting, error }: {
 const PAGE_SIZE = 10;
 
 export default function Members({ loaderData, actionData }: Route.ComponentProps) {
-  const { members, joinUrl, gymName } = loaderData;
+  const { members, joinUrl, gymName, hasPlans } = loaderData;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const todayIso = useMemo(() => new Date().toISOString().split("T")[0], []);
@@ -777,7 +819,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
           {joinUrl && (
             <button
               onClick={() => setShowQr(true)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl border border-orange-200 bg-orange-50 text-orange-600 hover:bg-orange-100 transition"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -785,8 +827,12 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
               Share QR
             </button>
           )}
-          <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl transition">
+          <button
+            onClick={() => hasPlans && setShowModal(true)}
+            disabled={!hasPlans}
+            title={!hasPlans ? "Create a membership plan first" : undefined}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -796,6 +842,21 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
       </div>
 
       <div className="p-8 space-y-5">
+        {!hasPlans && (
+          <div className="flex items-center gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
+            <svg className="w-5 h-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <span>
+              No membership plans found.{" "}
+              <Link to="/plans" className="font-semibold underline underline-offset-2 hover:text-amber-900">
+                Create a plan
+              </Link>{" "}
+              before adding members.
+            </span>
+          </div>
+        )}
+
         {(actionData as any)?.intent === "delete" && (actionData as any)?.error && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
             {(actionData as any).error}
@@ -829,7 +890,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, email, phone…"
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:bg-white transition"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white transition"
               />
               {search && (
                 <button onClick={() => setSearch("")}
@@ -897,11 +958,10 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                     const expired = isExpired(member.membershipEnd);
                     const name = `${member.user.firstName} ${member.user.lastName}`.trim();
                     return (
-                      <tr key={member._id} className="hover:bg-orange-50/30 transition-colors">
+                      <tr key={member._id} className="hover:bg-primary/5 transition-colors">
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full flex items-center justify-center text-orange-700 text-xs font-bold shrink-0"
-                              style={{ background: "linear-gradient(135deg,#fed7aa,#fdba74)" }}>
+                            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10 text-primary text-xs font-bold shrink-0">
                               {name[0]?.toUpperCase() ?? "?"}
                             </div>
                             <div>
@@ -931,7 +991,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               to={`/members/${member._id}`}
-                              className="text-xs font-medium text-gray-500 hover:text-orange-600 transition px-2.5 py-1.5 rounded-lg hover:bg-orange-50"
+                              className="text-xs font-medium text-gray-500 hover:text-primary transition px-2.5 py-1.5 rounded-lg hover:bg-primary/10"
                             >
                               View
                             </Link>
@@ -966,7 +1026,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
                 >‹</button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                   <button key={p} onClick={() => setPage(p)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition ${p === page ? "bg-orange-500 text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition ${p === page ? "bg-primary text-primary-foreground" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
                     {p}
                   </button>
                 ))}
@@ -1011,6 +1071,7 @@ export default function Members({ loaderData, actionData }: Route.ComponentProps
         onClose={() => setShowModal(false)}
         isSubmitting={isSubmitting}
         error={(actionData as any)?.intent === "create" ? (actionData as any)?.error : null}
+        fields={(actionData as any)?.intent === "create" ? (actionData as any)?.fields as FieldErrors | null : null}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import { Form, Link, useFetcher, useNavigation, useOutletContext } from "react-r
 import { useState, useEffect, useRef, useMemo } from "react";
 import type { Route } from "./+types/_app.staff";
 import { GravityLogo } from "~/components/GravityLogo";
+import { staffSchema, parseErrors, type FieldErrors } from "~/lib/validations";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,21 +69,27 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   if (intent === "create") {
-    const body: Record<string, unknown> = {};
+    const raw: Record<string, unknown> = {};
     for (const [k, v] of form.entries()) {
       if (k === "intent") continue;
       if (k === "workingDays[]") {
-        if (!Array.isArray(body.workingDays)) body.workingDays = [];
-        (body.workingDays as string[]).push(v as string);
+        if (!Array.isArray(raw.workingDays)) raw.workingDays = [];
+        (raw.workingDays as string[]).push(v as string);
       } else if (k === "specialization[]") {
-        if (!Array.isArray(body.specialization)) body.specialization = [];
-        (body.specialization as string[]).push(v as string);
+        if (!Array.isArray(raw.specialization)) raw.specialization = [];
+        (raw.specialization as string[]).push(v as string);
       } else {
-        body[k] = v;
+        raw[k] = v;
       }
     }
-    const res = await api.post<{ data: StaffMember; credentials?: { email: string; password: string } | null }>("/api/staff", body, token);
-    return { intent: "create", success: res.success, error: res.success ? null : res.message, credentials: res.success ? (res.credentials ?? null) : null };
+
+    const parsed = staffSchema.safeParse(raw);
+    if (!parsed.success) {
+      return { intent: "create", success: false, fields: parseErrors(parsed.error) as FieldErrors, error: null, credentials: null };
+    }
+
+    const res = await api.post<{ data: StaffMember; credentials?: { email: string; password: string } | null }>("/api/staff", { ...parsed.data, workingDays: raw.workingDays, specialization: raw.specialization }, token);
+    return { intent: "create", success: res.success, fields: null, error: res.success ? null : res.message, credentials: res.success ? (res.credentials ?? null) : null };
   }
 
   if (intent === "revoke") {
@@ -97,7 +104,7 @@ export async function action({ request }: Route.ActionArgs) {
 // ─── Role config ──────────────────────────────────────────────────────────────
 
 const ROLE_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
-  trainer:      { label: "Trainer",      color: "text-orange-700", bg: "bg-orange-50",  dot: "bg-orange-400" },
+  trainer:      { label: "Trainer",      color: "text-primary",    bg: "bg-primary/10", dot: "bg-primary"    },
   receptionist: { label: "Receptionist", color: "text-blue-700",   bg: "bg-blue-50",    dot: "bg-blue-400"   },
   manager:      { label: "Manager",      color: "text-purple-700", bg: "bg-purple-50",  dot: "bg-purple-400" },
   cleaner:      { label: "Cleaner",      color: "text-teal-700",   bg: "bg-teal-50",    dot: "bg-teal-400"   },
@@ -118,8 +125,8 @@ const ROLES_WITH_PORTAL = ["trainer", "manager", "receptionist"] as const;
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
-const inputCls  = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition";
-const selectCls = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition";
+const inputCls  = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
+const selectCls = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="block text-sm font-medium text-gray-700 mb-1.5">{children}</label>;
@@ -128,7 +135,7 @@ function Label({ children }: { children: React.ReactNode }) {
 function Section({ title, icon }: { title: string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-      <span className="w-6 h-6 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">{icon}</span>
+      <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">{icon}</span>
       <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{title}</span>
     </div>
   );
@@ -195,7 +202,7 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition flex items-center justify-between gap-2"
+        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition flex items-center justify-between gap-2"
         style={{ color: selected ? "#111827" : "#9ca3af" }}
       >
         <span>{displayVal || placeholder}</span>
@@ -226,12 +233,12 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
               return (
                 <button key={i} type="button" onClick={() => pick(date)} disabled={dis}
                   className={`h-8 w-full rounded-lg text-xs font-medium transition ${
-                    sel  ? "text-white"
-                    : tod ? "text-orange-600 font-bold"
-                    : cur ? "text-gray-800 hover:bg-orange-50"
+                    sel  ? "text-primary-foreground"
+                    : tod ? "text-primary font-bold"
+                    : cur ? "text-gray-800 hover:bg-primary/10"
                     :       "text-gray-300 hover:bg-gray-50"
                   } ${dis ? "opacity-30 cursor-not-allowed" : ""}`}
-                  style={sel ? { background: "linear-gradient(135deg,#f97316,#ea580c)", boxShadow: "0 2px 8px rgba(249,115,22,0.4)" } : {}}>
+                  style={sel ? { background: "var(--primary)" } : {}}>
                   {date.getDate()}
                 </button>
               );
@@ -241,7 +248,7 @@ function DatePicker({ name, max, min, placeholder = "Pick a date" }: {
             <button type="button" onClick={() => setSelected(null)}
               className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition">Clear</button>
             <button type="button" onClick={() => { if (!isDis(today)) { setSelected(today); setOpen(false); } }}
-              className="text-xs font-semibold text-orange-500 hover:text-orange-600 transition">Today</button>
+              className="text-xs font-semibold text-primary hover:text-primary/80 transition">Today</button>
           </div>
         </div>
       )}
@@ -298,8 +305,14 @@ function ConfirmDialog({ open, title, message, onConfirm, onCancel }: {
 
 // ─── Add Staff Modal ──────────────────────────────────────────────────────────
 
-function AddStaffModal({ open, onClose, isSubmitting, error }: {
-  open: boolean; onClose: () => void; isSubmitting: boolean; error?: string | null;
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
+}
+
+function AddStaffModal({ open, onClose, isSubmitting, error, fields }: {
+  open: boolean; onClose: () => void; isSubmitting: boolean;
+  error?: string | null; fields?: FieldErrors | null;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [role,             setRole]           = useState("trainer");
@@ -336,9 +349,8 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg,#fff7ed,#fed7aa)", border: "1px solid rgba(249,115,22,0.2)" }}>
-              <svg className="w-4.5 h-4.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-primary/10">
+              <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -380,15 +392,18 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>First name <span className="text-red-500">*</span></Label>
-                <input name="firstName" required type="text" placeholder="Arjun" className={inputCls} />
+                <input name="firstName" type="text" placeholder="Arjun" className={`${inputCls} ${fields?.firstName ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.firstName} />
               </div>
               <div>
                 <Label>Last name <span className="text-red-500">*</span></Label>
-                <input name="lastName" required type="text" placeholder="Sharma" className={inputCls} />
+                <input name="lastName" type="text" placeholder="Sharma" className={`${inputCls} ${fields?.lastName ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.lastName} />
               </div>
               <div>
                 <Label>Phone <span className="text-red-500">*</span></Label>
-                <input name="phone" required type="tel" placeholder="+91 98765 43210" className={inputCls} />
+                <input name="phone" type="tel" placeholder="+91 98765 43210" className={`${inputCls} ${fields?.phone ? "!border-red-400" : ""}`} />
+                <FieldError msg={fields?.phone} />
               </div>
               <div>
                 <Label>
@@ -399,22 +414,23 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
                   }
                 </Label>
                 <input
-                  name="email" type="email" placeholder="arjun@gym.com"
-                  required={ROLES_WITH_PORTAL.includes(role as any)}
-                  className={inputCls}
+                  name="email" type="text" placeholder="arjun@gym.com"
+                  className={`${inputCls} ${fields?.email ? "!border-red-400" : ""}`}
                 />
-                {ROLES_WITH_PORTAL.includes(role as any) && (
-                  <p className="mt-1 text-xs text-orange-500 font-medium">Required to create a portal login account</p>
+                {ROLES_WITH_PORTAL.includes(role as any) && !fields?.email && (
+                  <p className="mt-1 text-xs text-primary font-medium">Required to create a portal login account</p>
                 )}
+                <FieldError msg={fields?.email} />
               </div>
               <div>
                 <Label>Gender <span className="text-red-500">*</span></Label>
-                <select name="gender" required className={selectCls}>
+                <select name="gender" className={`${selectCls} ${fields?.gender ? "!border-red-400" : ""}`}>
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
+                <FieldError msg={fields?.gender} />
               </div>
               <div>
                 <Label>Date of birth</Label>
@@ -433,6 +449,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
             <div>
               <Label>Role <span className="text-red-500">*</span></Label>
               <input type="hidden" name="role" value={role} />
+              <FieldError msg={fields?.role} />
               <div className="flex flex-wrap gap-2">
                 {(["trainer","receptionist","manager","cleaner"] as const).map(r => {
                   const cfg = ROLE_CONFIG[r];
@@ -462,7 +479,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
                       <button key={s} type="button" onClick={() => toggleSpec(s)}
                         className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${
                           active
-                            ? "bg-orange-50 text-orange-700 border-orange-300"
+                            ? "bg-primary/10 text-primary border-primary/30"
                             : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300"
                         }`}>
                         {active && <span className="mr-1">✓</span>}{s}
@@ -477,6 +494,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
               <div>
                 <Label>Joining date <span className="text-red-500">*</span></Label>
                 <DatePicker name="joiningDate" placeholder="Pick joining date" />
+                <FieldError msg={fields?.joiningDate} />
               </div>
               <div>
                 <Label>Employment type</Label>
@@ -502,14 +520,14 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
                 <div className="relative flex-1">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">₹</span>
                   <input name="salaryAmount" type="number" min={0} placeholder="25000"
-                    className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition" />
+                    className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition" />
                 </div>
                 <div className="flex gap-1.5">
                   {(["monthly","per-session"] as const).map(t => (
                     <button key={t} type="button" onClick={() => setSalaryType(t)}
                       className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition whitespace-nowrap ${
                         salaryType === t
-                          ? "bg-orange-50 text-orange-700 border-orange-300"
+                          ? "bg-primary/10 text-primary border-primary/30"
                           : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300"
                       }`}>
                       {t === "monthly" ? "/ month" : "/ session"}
@@ -554,7 +572,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
                   <button key={s} type="button" onClick={() => setShiftType(s)}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition flex items-center justify-center gap-1.5 ${
                       shiftType === s
-                        ? "bg-orange-50 text-orange-700 border-orange-300"
+                        ? "bg-primary/10 text-primary border-primary/30"
                         : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300"
                     }`}>
                     <span>{s === "morning" ? "🌅" : s === "evening" ? "🌇" : "⏱️"}</span>
@@ -591,8 +609,7 @@ function AddStaffModal({ open, onClose, isSubmitting, error }: {
             type="submit"
             form="add-staff-form"
             disabled={isSubmitting}
-            className="flex-1 py-2.5 text-sm font-bold text-white rounded-xl transition disabled:opacity-60"
-            style={{ background: "linear-gradient(135deg,#f97316,#ea580c)", boxShadow: "0 4px 14px rgba(249,115,22,0.35)" }}
+            className="flex-1 py-2.5 text-sm font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl transition disabled:opacity-60"
           >
             {isSubmitting ? "Adding…" : "Add Staff Member"}
           </button>
@@ -677,11 +694,11 @@ function JoinQRModal({ open, joinUrl, gymName, onClose }: {
 
         <div className="flex flex-col items-center px-6 py-6 gap-4">
           {joinUrl ? (
-            <div className="p-4 rounded-2xl border-2 border-orange-100 bg-orange-50">
+            <div className="p-4 rounded-2xl border-2 border-primary/20 bg-primary/5">
               <canvas ref={canvasRef} />
             </div>
           ) : (
-            <div className="p-4 rounded-2xl border-2 border-orange-100 bg-orange-50 w-[232px] h-[232px] flex items-center justify-center">
+            <div className="p-4 rounded-2xl border-2 border-primary/20 bg-primary/5 w-[232px] h-[232px] flex items-center justify-center">
               <p className="text-xs text-center text-gray-400">Complete gym onboarding to generate a join QR.</p>
             </div>
           )}
@@ -716,8 +733,7 @@ function JoinQRModal({ open, joinUrl, gymName, onClose }: {
               type="button"
               onClick={downloadQr}
               disabled={!joinUrl}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-xl text-white transition disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)", boxShadow: "0 4px 12px rgba(249,115,22,0.35)" }}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-40"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -824,8 +840,7 @@ function CredentialsModal({ credentials, onClose }: {
         <div className="h-px bg-gray-100 mx-6" />
         <div className="px-6 py-4">
           <button type="button" onClick={onClose}
-            className="w-full py-2.5 text-sm font-bold text-white rounded-xl transition"
-            style={{ background: "linear-gradient(135deg,#f97316,#ea580c)", boxShadow: "0 4px 12px rgba(249,115,22,0.35)" }}>
+            className="w-full py-2.5 text-sm font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl transition">
             Done
           </button>
         </div>
@@ -923,8 +938,7 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
           {isAdmin && (
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition"
-              style={{ background: "linear-gradient(135deg,#f97316,#ea580c)", boxShadow: "0 4px 14px rgba(249,115,22,0.3)" }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -963,7 +977,7 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
               <input
                 type="text" value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search by name, phone, staff ID…"
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:bg-white transition"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white transition"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -1037,7 +1051,7 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-semibold text-gray-900 truncate group-hover:text-orange-600 transition-colors">{s.firstName} {s.lastName}</p>
+                            <p className="font-semibold text-gray-900 truncate group-hover:text-primary transition-colors">{s.firstName} {s.lastName}</p>
                             <p className="text-xs text-gray-400">{s.staffId ?? "—"}</p>
                           </div>
                         </Link>
@@ -1145,6 +1159,7 @@ export default function Staff({ loaderData, actionData }: Route.ComponentProps) 
         onClose={() => setShowModal(false)}
         isSubmitting={isSubmitting}
         error={createError}
+        fields={(actionData as any)?.intent === "create" ? (actionData as any)?.fields as FieldErrors | null : null}
       />
 
       {/* Delete confirmation */}

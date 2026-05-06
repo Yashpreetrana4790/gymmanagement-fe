@@ -7,7 +7,7 @@ import {
   redirect,
   useSearchParams,
 } from "react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Route } from "./+types/_app.members.$id";
 import { MemberAttendanceHeatmap } from "~/components/MemberAttendanceHeatmap";
 
@@ -59,8 +59,8 @@ export function ErrorBoundary({ error }: { error: unknown }) {
   const is404 = isRouteErrorResponse(error) && error.status === 404;
   return (
     <div className="min-h-full flex flex-col items-center justify-center p-12 text-center bg-gray-50">
-      <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center mb-5 border border-orange-100">
-        <svg className="w-8 h-8 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 border border-primary/20">
+        <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -74,7 +74,7 @@ export function ErrorBoundary({ error }: { error: unknown }) {
           : "An unexpected error occurred while loading this member."}
       </p>
       <Link to="/members"
-        className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-500 hover:text-orange-600 transition">
+        className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -124,6 +124,19 @@ export async function action({ request, params }: Route.ActionArgs) {
   const form = await request.formData();
   const intent = form.get("intent");
   const url = new URL(request.url);
+
+  if (intent === "ai-suggest") {
+    const result = await api.post<{
+      data: {
+        diet:     { title: string; notes: string; items: string[] };
+        exercise: { title: string; notes: string; routine: { name: string; detail: string }[] };
+      };
+    }>(`/api/ai/members/${params.id}/suggest`, {}, token);
+    if (!result.success) {
+      return { ok: false as const, error: result.message ?? "AI generation failed." };
+    }
+    return { ok: true as const, aiPrograms: result.data };
+  }
 
   if (intent === "programs") {
     const dietItems = String(form.get("dietItems") ?? "")
@@ -232,7 +245,7 @@ const BODY_LABEL: Record<string, string> = {
 };
 
 const inputDark =
-  "w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition";
+  "w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition";
 
 // ─── UI atoms ─────────────────────────────────────────────────────────────────
 
@@ -250,7 +263,7 @@ function SectionCard({
   return (
     <div className={`rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${className}`}>
       <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-200">
-        <span className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 shrink-0 border border-orange-100">
+        <span className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
           {icon}
         </span>
         <h3 className="text-sm font-semibold text-gray-900 tracking-tight">{title}</h3>
@@ -270,107 +283,198 @@ function Row({ label, value }: { label: string; value?: React.ReactNode }) {
   );
 }
 
+type AiPrograms = {
+  diet:     { title: string; notes: string; items: string[] };
+  exercise: { title: string; notes: string; routine: { name: string; detail: string }[] };
+};
+
 function ProgramsForm({ member }: { member: FullMember }) {
-  const fetcher = useFetcher();
+  const saveFetcher = useFetcher();
+  const aiFetcher   = useFetcher();
+
   const d = member.assignedPrograms?.diet;
   const e = member.assignedPrograms?.exercise;
-  const routineText = useMemo(
-    () =>
-      (e?.routine ?? [])
-        .map((r) => {
-          const name = r.name?.trim() ?? "";
-          const detail = r.detail?.trim() ?? "";
-          return detail ? `${name} — ${detail}` : name;
-        })
-        .filter(Boolean)
-        .join("\n"),
-    [e?.routine]
-  );
-  const [dietItems, setDietItems] = useState(() => (d?.items ?? []).join("\n"));
-  const [routineLines, setRoutineLines] = useState(routineText);
 
-  const busy = fetcher.state !== "idle";
+  const initRoutineText = (e?.routine ?? [])
+    .map((r) => {
+      const name   = r.name?.trim()   ?? "";
+      const detail = r.detail?.trim() ?? "";
+      return detail ? `${name} — ${detail}` : name;
+    })
+    .filter(Boolean)
+    .join("\n");
+
+  const [dietTitle,    setDietTitle]    = useState(d?.title ?? "");
+  const [dietNotes,    setDietNotes]    = useState(d?.notes ?? "");
+  const [dietItems,    setDietItems]    = useState((d?.items ?? []).join("\n"));
+  const [exTitle,      setExTitle]      = useState(e?.title ?? "");
+  const [exNotes,      setExNotes]      = useState(e?.notes ?? "");
+  const [routineLines, setRoutineLines] = useState(initRoutineText);
+  const [aiApplied,    setAiApplied]    = useState(false);
+
+  // When AI returns a result, populate all fields
+  const aiData = (aiFetcher.data as any)?.aiPrograms as AiPrograms | undefined;
+  const aiError = (aiFetcher.data as any)?.error as string | undefined;
+
+  useEffect(() => {
+    if (!aiData) return;
+    setDietTitle(aiData.diet.title ?? "");
+    setDietNotes(aiData.diet.notes ?? "");
+    setDietItems((aiData.diet.items ?? []).join("\n"));
+    setExTitle(aiData.exercise.title ?? "");
+    setExNotes(aiData.exercise.notes ?? "");
+    setRoutineLines(
+      (aiData.exercise.routine ?? [])
+        .map((r) => (r.detail ? `${r.name} — ${r.detail}` : r.name))
+        .filter(Boolean)
+        .join("\n")
+    );
+    setAiApplied(true);
+  }, [aiData]);
+
+  const saving    = saveFetcher.state !== "idle";
+  const generating = aiFetcher.state !== "idle";
 
   return (
-    <fetcher.Form method="post" className="space-y-5">
-      <input type="hidden" name="intent" value="programs" />
-      <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Diet plan</p>
-        <div className="space-y-3">
-          <input
-            name="dietTitle"
-            defaultValue={d?.title ?? ""}
-            placeholder="Title (e.g. High protein, mild deficit)"
-            className={inputDark}
-          />
-          <textarea
-            name="dietNotes"
-            defaultValue={d?.notes ?? ""}
-            rows={3}
-            placeholder="Notes, calorie targets, meal timing…"
-            className={`${inputDark} resize-y min-h-[80px]`}
-          />
-          <div>
-            <label className="block text-xs text-gray-500 mb-1.5">Meal / rule list (one per line)</label>
-            <textarea
-              name="dietItems"
-              value={dietItems}
-              onChange={(ev) => setDietItems(ev.target.value)}
-              rows={4}
-              placeholder={"Breakfast: oats + fruit\nLunch: rice + dal + veg\n…"}
-              className={`${inputDark} resize-y min-h-[96px] font-mono text-[13px]`}
-            />
-          </div>
-        </div>
+    <div className="space-y-5">
+      {/* AI generate button */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          Programs &amp; Plans
+        </p>
+        <aiFetcher.Form method="post">
+          <input type="hidden" name="intent" value="ai-suggest" />
+          <button
+            type="submit"
+            disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition
+              bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 disabled:opacity-50"
+          >
+            {generating ? (
+              <>
+                <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Generating…
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                Generate with AI
+              </>
+            )}
+          </button>
+        </aiFetcher.Form>
       </div>
 
-      <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Exercise plan</p>
-        <div className="space-y-3">
-          <input
-            name="exerciseTitle"
-            defaultValue={e?.title ?? ""}
-            placeholder="Title (e.g. Push / Pull / Legs)"
-            className={inputDark}
-          />
-          <textarea
-            name="exerciseNotes"
-            defaultValue={e?.notes ?? ""}
-            rows={2}
-            placeholder="Session length, progression, rest days…"
-            className={`${inputDark} resize-y min-h-[64px]`}
-          />
-          <div>
-            <label className="block text-xs text-gray-500 mb-1.5">
-              Routine (one exercise per line — optional detail after — or | )
-            </label>
-            <textarea
-              name="exerciseRoutineLines"
-              value={routineLines}
-              onChange={(ev) => setRoutineLines(ev.target.value)}
-              rows={6}
-              placeholder={"Squats — 3×10\nBench press — 3×8\nFace pulls | 3×15"}
-              className={`${inputDark} resize-y min-h-[120px] font-mono text-[13px]`}
-            />
-          </div>
+      {/* AI banner */}
+      {aiApplied && !generating && (
+        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200 text-violet-700 text-xs font-medium">
+          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          AI plan generated — review and edit, then save.
+          <button type="button" onClick={() => setAiApplied(false)} className="ml-auto text-violet-400 hover:text-violet-600">
+            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
+              <path d="M9.5 2.5l-7 7M2.5 2.5l7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+            </svg>
+          </button>
         </div>
-      </div>
-
-      {fetcher.data &&
-        typeof fetcher.data === "object" &&
-        "error" in fetcher.data &&
-        (fetcher.data as { error?: string }).error && (
-        <p className="text-sm text-red-400">{(fetcher.data as { error: string }).error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 disabled:opacity-50 text-white text-sm font-semibold transition"
-      >
-        {busy ? "Saving…" : "Save programs"}
-      </button>
-    </fetcher.Form>
+      {aiError && (
+        <p className="text-xs text-red-500 font-medium">{aiError}</p>
+      )}
+
+      {/* Save form */}
+      <saveFetcher.Form method="post" className="space-y-5">
+        <input type="hidden" name="intent" value="programs" />
+
+        {/* Diet */}
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Diet plan</p>
+          <div className="space-y-3">
+            <input
+              name="dietTitle"
+              value={dietTitle}
+              onChange={(e) => setDietTitle(e.target.value)}
+              placeholder="Title (e.g. High protein, mild deficit)"
+              className={inputDark}
+            />
+            <textarea
+              name="dietNotes"
+              value={dietNotes}
+              onChange={(e) => setDietNotes(e.target.value)}
+              rows={3}
+              placeholder="Notes, calorie targets, meal timing…"
+              className={`${inputDark} resize-y min-h-[80px]`}
+            />
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">Meal list (one per line)</label>
+              <textarea
+                name="dietItems"
+                value={dietItems}
+                onChange={(e) => setDietItems(e.target.value)}
+                rows={4}
+                placeholder={"Breakfast: oats + fruit\nLunch: rice + dal + veg\n…"}
+                className={`${inputDark} resize-y min-h-[96px] font-mono text-[13px]`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Exercise */}
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Exercise plan</p>
+          <div className="space-y-3">
+            <input
+              name="exerciseTitle"
+              value={exTitle}
+              onChange={(e) => setExTitle(e.target.value)}
+              placeholder="Title (e.g. Push / Pull / Legs)"
+              className={inputDark}
+            />
+            <textarea
+              name="exerciseNotes"
+              value={exNotes}
+              onChange={(e) => setExNotes(e.target.value)}
+              rows={2}
+              placeholder="Session length, progression, rest days…"
+              className={`${inputDark} resize-y min-h-[64px]`}
+            />
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">
+                Routine (one per line — detail after — or |)
+              </label>
+              <textarea
+                name="exerciseRoutineLines"
+                value={routineLines}
+                onChange={(e) => setRoutineLines(e.target.value)}
+                rows={6}
+                placeholder={"Squats — 3×10\nBench press — 3×8\nFace pulls | 3×15"}
+                className={`${inputDark} resize-y min-h-[120px] font-mono text-[13px]`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {saveFetcher.data && typeof saveFetcher.data === "object" && "error" in saveFetcher.data &&
+          (saveFetcher.data as { error?: string }).error && (
+          <p className="text-sm text-red-400">{(saveFetcher.data as { error: string }).error}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground text-sm font-semibold transition"
+        >
+          {saving ? "Saving…" : "Save programs"}
+        </button>
+      </saveFetcher.Form>
+    </div>
   );
 }
 
@@ -432,7 +536,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
           </div>
           <Link
             to="/members"
-            className="text-xs font-medium text-gray-500 hover:text-orange-500 transition shrink-0"
+            className="text-xs font-medium text-gray-500 hover:text-primary transition shrink-0"
           >
             All members
           </Link>
@@ -445,12 +549,9 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
         <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
           <div
             className="h-28 sm:h-32 w-full relative"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(249,115,22,0.24) 0%, rgba(255,237,213,1) 55%, rgba(255,255,255,1) 100%)",
-            }}
+            style={{ background: "color-mix(in oklch, var(--primary) 20%, var(--background))" }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-500/20 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
           </div>
 
           <div className="px-6 sm:px-8 pb-8 -mt-12 relative">
@@ -458,7 +559,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
               <div className="flex items-end gap-4">
                 <div
                   className="w-24 h-24 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-3xl font-black text-white shrink-0"
-                  style={{ background: "linear-gradient(135deg,#f97316,#ea580c)" }}
+                  style={{ background: "var(--primary)" }}
                 >
                   {name[0]?.toUpperCase() ?? "?"}
                 </div>
@@ -482,7 +583,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                     member.membershipType === "premium"
                       ? "bg-amber-950/50 text-amber-300 border-amber-800/70"
                       : member.membershipType === "standard"
-                        ? "bg-orange-950/50 text-orange-300 border-orange-800/70"
+                        ? "bg-primary/20 text-primary-foreground border-primary/40"
                         : "bg-gray-100 text-gray-600 border-gray-200"
                   }`}
                 >
@@ -637,7 +738,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                       type="button"
                       onClick={() => setYear(y)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                        year === y ? "bg-orange-500 text-white shadow" : "text-gray-600 hover:text-gray-900"
+                        year === y ? "bg-primary text-primary-foreground shadow" : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
                       {y}
@@ -865,7 +966,7 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
         <div className="pt-2">
           <Link
             to="/members"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-500 transition font-medium"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition font-medium"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

@@ -28,6 +28,9 @@ export default [
     route("feedback", "routes/_app.feedback.tsx"),
     route("gallery", "routes/_app.gallery.tsx"),
   ]),
+  // Theme API
+  route("api/theme", "routes/api.theme.ts"),
+
   // Public gym join form (no auth)
   route("join/:qrToken", "routes/join.$qrToken.tsx"),
   // Public staff application form (no auth)

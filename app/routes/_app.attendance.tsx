@@ -60,7 +60,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 const PLAN_BADGE: Record<string, string> = {
   premium:  "bg-amber-100 text-amber-700 border border-amber-200",
-  standard: "bg-orange-100 text-orange-700 border border-orange-200",
+  standard: "bg-primary/10 text-primary border border-primary/20",
   basic:    "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
@@ -156,7 +156,7 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
         {/* Stat chips */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Today's check-ins", value: todayCount, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100" },
+            { label: "Today's check-ins", value: todayCount, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
             { label: "Total visits (all time)", value: total, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-100" },
             { label: "Total members", value: members.length, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
           ].map((s) => (
@@ -173,7 +173,7 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">Log a check-in</label>
             <div className="relative">
               <div
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm flex items-center gap-2 cursor-pointer focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm flex items-center gap-2 cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent"
                 onClick={() => setDropdownOpen(true)}
               >
                 {selectedMember ? (
@@ -214,11 +214,10 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
                       key={m._id}
                       type="button"
                       onMouseDown={() => { setSelectedMember(m._id); setDropdownOpen(false); setMemberSearch(""); }}
-                      className="w-full text-left px-4 py-2.5 hover:bg-orange-50 transition flex items-center gap-3"
+                      className="w-full text-left px-4 py-2.5 hover:bg-primary/5 transition flex items-center gap-3"
                     >
                       <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-orange-700 text-xs font-bold shrink-0"
-                        style={{ background: "linear-gradient(135deg,#fed7aa,#fdba74)" }}
+                        className="w-7 h-7 rounded-full flex items-center justify-center bg-primary/10 text-primary text-xs font-bold shrink-0"
                       >
                         {m.user.firstName[0]?.toUpperCase()}
                       </div>
@@ -237,12 +236,8 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
             type="button"
             disabled={!selectedMember || isSubmitting}
             onClick={handleCheckIn}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all shrink-0"
-            style={{
-              background: !selectedMember || isSubmitting ? "rgba(249,115,22,0.4)" : "linear-gradient(135deg,#f59e0b,#f97316)",
-              boxShadow: !selectedMember || isSubmitting ? "none" : "0 4px 12px rgba(249,115,22,0.35)",
-              cursor: !selectedMember || isSubmitting ? "not-allowed" : "pointer",
-            }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all shrink-0 ${!selectedMember || isSubmitting ? "bg-primary/40 text-primary-foreground" : "bg-primary text-primary-foreground"}`}
+            style={{ cursor: !selectedMember || isSubmitting ? "not-allowed" : "pointer" }}
           >
             {isSubmitting ? (
               <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Logging…</>
@@ -272,7 +267,7 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name or email…"
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:bg-white transition"
+                className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white transition"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -289,7 +284,7 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
                   key={f}
                   type="button"
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-2 text-xs font-semibold transition ${filter === f ? "bg-orange-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                  className={`px-4 py-2 text-xs font-semibold transition ${filter === f ? "bg-primary text-primary-foreground" : "bg-white text-gray-600 hover:bg-gray-50"}`}
                 >
                   {f === "today" ? "Today" : "All time"}
                 </button>
@@ -325,13 +320,12 @@ export default function Attendance({ loaderData }: Route.ComponentProps) {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filteredEntries.map((entry, i) => (
-                    <tr key={entry.entryId as string} className="hover:bg-orange-50/30 transition-colors">
+                    <tr key={entry.entryId as string} className="hover:bg-primary/5 transition-colors">
                       <td className="px-5 py-3.5 text-xs text-gray-400 font-medium">{i + 1}</td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-orange-700 text-xs font-bold shrink-0"
-                            style={{ background: "linear-gradient(135deg,#fed7aa,#fdba74)" }}
+                            className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary text-xs font-bold shrink-0"
                           >
                             {entry.memberName[0]?.toUpperCase() ?? "?"}
                           </div>
