@@ -1,4 +1,8 @@
-const API_URL = process.env.API_URL ?? "http://localhost:5000";
+const API_URL = process.env.API_URL;
+if (!API_URL) {
+  console.warn("[API] API_URL is not set — defaulting to http://localhost:5000. Set API_URL in your environment variables.");
+}
+const _API_URL = API_URL ?? "http://localhost:5000";
 
 type ApiResponse<T = unknown> = { success: boolean; message?: string } & T;
 
@@ -9,7 +13,7 @@ async function request<T>(
 ): Promise<ApiResponse<T>> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(`${_API_URL}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
