@@ -22,6 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
 # Added by code-review-graph
 .code-review-graph/
+config.bat
