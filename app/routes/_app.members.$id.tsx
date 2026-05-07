@@ -261,7 +261,7 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden card-glass ${className}`}>
+    <div className={`rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden ${className}`}>
       <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-200">
         <span className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
           {icon}
@@ -277,7 +277,7 @@ function Row({ label, value }: { label: string; value?: React.ReactNode }) {
   if (!value && value !== 0) return null;
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-gray-100 last:border-0">
-      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide w-36 shrink-0">{label}</span>
+      <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest w-36 shrink-0">{label}</span>
       <span className="text-sm text-gray-700 font-medium text-right flex-1">{value}</span>
     </div>
   );
@@ -338,8 +338,8 @@ function ProgramsForm({ member }: { member: FullMember }) {
   return (
     <div className="space-y-5">
       {/* AI generate button */}
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+      <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
           Programs &amp; Plans
         </p>
         <aiFetcher.Form method="post">
@@ -390,12 +390,12 @@ function ProgramsForm({ member }: { member: FullMember }) {
       )}
 
       {/* Save form */}
-      <saveFetcher.Form method="post" className="space-y-5">
+      <saveFetcher.Form method="post" className="space-y-5 rounded-xl border border-gray-200 bg-white p-4">
         <input type="hidden" name="intent" value="programs" />
 
         {/* Diet */}
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Diet plan</p>
+          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2">Diet plan</p>
           <div className="space-y-3">
             <input
               name="dietTitle"
@@ -428,7 +428,7 @@ function ProgramsForm({ member }: { member: FullMember }) {
 
         {/* Exercise */}
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Exercise plan</p>
+          <p className="text-xs font-semibold text-sky-600 uppercase tracking-wide mb-2">Exercise plan</p>
           <div className="space-y-3">
             <input
               name="exerciseTitle"
@@ -543,48 +543,41 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-10 pb-16">
+      <div className="p-6 sm:p-8 max-w-6xl mx-auto space-y-8 pb-16">
 
         {/* Profile hero */}
         <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
-          <div
-            className="h-28 sm:h-32 w-full relative"
-            style={{ background: "color-mix(in oklch, var(--primary) 20%, var(--background))" }}
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.24),transparent_42%)]" />
-          </div>
-
-          <div className="px-6 sm:px-8 pb-8 -mt-12 relative">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <div className="flex items-end gap-4">
+          <div className="h-2 w-full bg-linear-to-r from-primary/80 via-primary to-primary/70" />
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+              <div className="flex items-center gap-4 min-w-0">
                 <div
-                  className="w-24 h-24 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-3xl font-black text-white shrink-0 ring-4 ring-primary/10"
-                  style={{ background: "var(--primary)" }}
+                  className="w-18 h-18 rounded-2xl shadow-md flex items-center justify-center text-2xl font-black text-white shrink-0 border border-primary/30"
+                  style={{ background: "linear-gradient(145deg,var(--primary),color-mix(in oklch,var(--primary) 70%, black))" }}
                 >
                   {name[0]?.toUpperCase() ?? "?"}
                 </div>
-                <div className="pb-1 min-w-0">
+                <div className="min-w-0">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight truncate">{name}</h1>
                   <p className="text-gray-500 text-sm mt-0.5 truncate">{member.user.email}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                     expired
-                      ? "bg-red-950/60 text-red-300 border-red-800/80"
-                      : "bg-emerald-950/60 text-emerald-300 border-emerald-800/80"
+                      ? "bg-red-50 text-red-700 border-red-200"
+                      : "bg-emerald-50 text-emerald-700 border-emerald-200"
                   }`}
                 >
                   {expired ? "Expired" : "Active"}
                 </span>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold capitalize border ${
+                  className={`px-3 py-1 rounded-full text-xs font-semibold capitalize border ${
                     member.membershipType === "premium"
-                      ? "bg-amber-950/50 text-amber-300 border-amber-800/70"
+                      ? "bg-amber-50 text-amber-700 border-amber-200"
                       : member.membershipType === "standard"
-                        ? "bg-primary/20 text-primary-foreground border-primary/40"
+                        ? "bg-primary/10 text-primary border-primary/30"
                         : "bg-gray-100 text-gray-600 border-gray-200"
                   }`}
                 >
@@ -593,30 +586,53 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {[
                 {
                   label: "Member since",
                   value: formatDate(member.createdAt, { month: "short", year: "numeric" }),
+                  icon: (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  ),
                 },
                 {
                   label: "Expires",
                   value: formatDate(member.membershipEnd, { day: "numeric", month: "short", year: "numeric" }),
                   valueClass: expired ? "text-red-500" : daysLeft && daysLeft <= 7 ? "text-amber-600" : "text-gray-900",
                   sub: expired ? "Expired" : daysLeft !== null ? `${daysLeft} days left` : "",
+                  icon: (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ),
                 },
                 {
                   label: "Age",
                   value: memberAge !== null ? `${memberAge} yrs` : "—",
+                  icon: (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1112 21v-4.5" />
+                    </svg>
+                  ),
                 },
                 {
                   label: "Goal",
                   value: member.goal?.primary ? GOAL_LABEL[member.goal.primary] ?? member.goal.primary : "—",
+                  icon: (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  ),
                 },
               ].map((s) => (
-                <div key={s.label} className="rounded-xl bg-gray-50 border border-gray-200 p-3.5 hover:border-gray-300 transition">
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">{s.label}</p>
-                  <p className={`text-sm font-bold mt-1 ${(s as { valueClass?: string }).valueClass ?? "text-gray-900"}`}>
+                <div key={s.label} className="rounded-xl bg-gray-50 border border-gray-200 p-3.5">
+                  <div className="flex items-center gap-1.5 text-gray-400 mb-1">
+                    {s.icon}
+                    <p className="text-[10px] font-semibold uppercase tracking-wider">{s.label}</p>
+                  </div>
+                  <p className={`text-sm font-bold ${(s as { valueClass?: string }).valueClass ?? "text-gray-900"}`}>
                     {s.value}
                   </p>
                   {(s as { sub?: string }).sub ? (
@@ -796,18 +812,25 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                 {(member.assignedPrograms?.diet?.title ||
                   member.assignedPrograms?.diet?.notes ||
                   (member.assignedPrograms?.diet?.items && member.assignedPrograms.diet.items.length > 0)) && (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-xs font-semibold text-emerald-400/90 uppercase tracking-wide mb-2">Diet</p>
+                  <div className="rounded-xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Diet</p>
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold">
+                        Nutrition
+                      </span>
+                    </div>
                     {member.assignedPrograms?.diet?.title && (
-                      <p className="text-gray-900 font-semibold">{member.assignedPrograms.diet.title}</p>
+                      <p className="text-gray-900 font-bold text-lg">{member.assignedPrograms.diet.title}</p>
                     )}
                     {member.assignedPrograms?.diet?.notes && (
-                      <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">{member.assignedPrograms.diet.notes}</p>
+                      <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{member.assignedPrograms.diet.notes}</p>
                     )}
                     {member.assignedPrograms?.diet?.items && member.assignedPrograms.diet.items.length > 0 && (
-                      <ul className="mt-3 list-disc list-inside text-sm text-gray-700 space-y-1">
+                      <ul className="mt-3 grid grid-cols-1 gap-2">
                         {member.assignedPrograms.diet.items.map((it) => (
-                          <li key={it}>{it}</li>
+                          <li key={it} className="text-sm text-gray-700 rounded-lg border border-emerald-100 bg-white px-3 py-2 leading-relaxed">
+                            {it}
+                          </li>
                         ))}
                       </ul>
                     )}
@@ -817,13 +840,18 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                   member.assignedPrograms?.exercise?.notes ||
                   (member.assignedPrograms?.exercise?.routine &&
                     member.assignedPrograms.exercise.routine.length > 0)) && (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-xs font-semibold text-sky-400/90 uppercase tracking-wide mb-2">Exercise</p>
+                  <div className="rounded-xl border border-sky-200 bg-linear-to-br from-sky-50 to-white p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-semibold text-sky-700 uppercase tracking-wide">Exercise</p>
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 font-semibold">
+                        Training
+                      </span>
+                    </div>
                     {member.assignedPrograms?.exercise?.title && (
-                      <p className="text-gray-900 font-semibold">{member.assignedPrograms.exercise.title}</p>
+                      <p className="text-gray-900 font-bold text-lg">{member.assignedPrograms.exercise.title}</p>
                     )}
                     {member.assignedPrograms?.exercise?.notes && (
-                      <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">
+                      <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">
                         {member.assignedPrograms.exercise.notes}
                       </p>
                     )}
@@ -831,9 +859,9 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                       member.assignedPrograms.exercise.routine.length > 0 && (
                         <ul className="mt-3 space-y-2">
                           {member.assignedPrograms.exercise.routine.map((r, i) => (
-                            <li key={i} className="text-sm border-l-2 border-gray-300 pl-3">
-                              <span className="text-gray-800 font-medium">{r.name}</span>
-                              {r.detail ? <span className="text-gray-500"> — {r.detail}</span> : null}
+                            <li key={i} className="text-sm rounded-lg border border-sky-100 bg-white px-3 py-2.5">
+                              <span className="text-gray-800 font-semibold">{r.name}</span>
+                              {r.detail ? <span className="text-gray-600"> — {r.detail}</span> : null}
                             </li>
                           ))}
                         </ul>
@@ -891,90 +919,76 @@ export default function MemberDetail({ loaderData }: Route.ComponentProps) {
                 }
               />
             </SectionCard>
+
+            <SectionCard
+              title="Diet preferences (onboarding)"
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              }
+            >
+              <Row label="Diet type" value={member.diet?.type ? DIET_LABEL[member.diet.type] ?? member.diet.type : undefined} />
+              <Row label="Allergies" value={member.diet?.allergies?.length ? member.diet.allergies.join(", ") : undefined} />
+              <Row label="Supplements" value={member.diet?.supplements} />
+              {!member.diet?.type && !member.diet?.allergies?.length && !member.diet?.supplements && (
+                <p className="text-xs text-gray-500 py-2">No diet preferences recorded.</p>
+              )}
+            </SectionCard>
+
+            <SectionCard
+              title="Fitness goal"
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              }
+            >
+              <Row
+                label="Primary goal"
+                value={member.goal?.primary ? GOAL_LABEL[member.goal.primary] ?? member.goal.primary : undefined}
+              />
+              <Row label="Target weight" value={member.goal?.targetWeight ? `${member.goal.targetWeight} kg` : undefined} />
+              <Row label="Notes" value={member.goal?.notes} />
+            </SectionCard>
+
+            <SectionCard
+              title="Health & medical"
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              }
+            >
+              <Row label="Conditions" value={member.health?.medicalConditions} />
+              <Row label="Injuries" value={member.health?.injuries} />
+              <Row label="Notes" value={member.health?.notes} />
+              {!member.health?.medicalConditions && !member.health?.injuries && !member.health?.notes && (
+                <p className="text-xs text-gray-500 py-2">No health information recorded.</p>
+              )}
+            </SectionCard>
+
+            <SectionCard
+              title="Emergency contact"
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              }
+            >
+              <Row label="Name" value={member.emergencyContact?.name} />
+              <Row label="Phone" value={member.emergencyContact?.phone} />
+              <Row label="Relation" value={member.emergencyContact?.relation} />
+              {!member.emergencyContact?.name && !member.emergencyContact?.phone && (
+                <p className="text-xs text-gray-500 py-2">No emergency contact recorded.</p>
+              )}
+            </SectionCard>
           </div>
         </div>
 
-        {/* Preferences grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SectionCard
-            title="Diet preferences (onboarding)"
-            icon={
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            }
-          >
-            <Row label="Diet type" value={member.diet?.type ? DIET_LABEL[member.diet.type] ?? member.diet.type : undefined} />
-            <Row label="Allergies" value={member.diet?.allergies?.length ? member.diet.allergies.join(", ") : undefined} />
-            <Row label="Supplements" value={member.diet?.supplements} />
-            {!member.diet?.type && !member.diet?.allergies?.length && !member.diet?.supplements && (
-              <p className="text-xs text-gray-500 py-2">No diet preferences recorded.</p>
-            )}
-          </SectionCard>
-
-          <SectionCard
-            title="Fitness goal"
-            icon={
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            }
-          >
-            <Row
-              label="Primary goal"
-              value={member.goal?.primary ? GOAL_LABEL[member.goal.primary] ?? member.goal.primary : undefined}
-            />
-            <Row label="Target weight" value={member.goal?.targetWeight ? `${member.goal.targetWeight} kg` : undefined} />
-            <Row label="Notes" value={member.goal?.notes} />
-          </SectionCard>
-
-          <SectionCard
-            title="Health & medical"
-            icon={
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            }
-          >
-            <Row label="Conditions" value={member.health?.medicalConditions} />
-            <Row label="Injuries" value={member.health?.injuries} />
-            <Row label="Notes" value={member.health?.notes} />
-            {!member.health?.medicalConditions && !member.health?.injuries && !member.health?.notes && (
-              <p className="text-xs text-gray-500 py-2">No health information recorded.</p>
-            )}
-          </SectionCard>
-
-          <SectionCard
-            title="Emergency contact"
-            icon={
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            }
-          >
-            <Row label="Name" value={member.emergencyContact?.name} />
-            <Row label="Phone" value={member.emergencyContact?.phone} />
-            <Row label="Relation" value={member.emergencyContact?.relation} />
-            {!member.emergencyContact?.name && !member.emergencyContact?.phone && (
-              <p className="text-xs text-gray-500 py-2">No emergency contact recorded.</p>
-            )}
-          </SectionCard>
-        </div>
-
-        <div className="pt-2">
-          <Link
-            to="/members"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition font-medium"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to members
-          </Link>
-        </div>
         <div className="sticky bottom-4 z-10">
           <div className="mx-auto w-fit rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-sm px-3 py-2 flex items-center gap-2">
             <Link

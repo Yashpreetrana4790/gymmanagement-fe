@@ -259,35 +259,51 @@ function PlanPopularityChart({
     );
   }
 
+  const totalMembers = breakdown.reduce((sum, b) => sum + b.count, 0);
+  const sorted = [...breakdown].sort((a, b) => b.count - a.count);
+  const topPlan = sorted[0];
   const maxCount = Math.max(...breakdown.map((b) => b.count), 1);
 
   return (
-    <div className="space-y-4">
-      {/* Bars */}
-      <div className="space-y-3">
-        {breakdown.map((b) => {
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Total members in plans</p>
+          <p className="text-xl font-black text-gray-900 mt-1">{totalMembers}</p>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Most popular plan</p>
+          <p className="text-sm font-bold text-gray-900 mt-1 capitalize">{topPlan?._id ?? "—"}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{topPlan?.count ?? 0} members</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {sorted.map((b) => {
           const color = PLAN_COLORS[b._id] ?? "#6b7280";
           const pct = Math.round((b.count / maxCount) * 100);
           const activePct = b.count > 0 ? Math.round((b.active / b.count) * 100) : 0;
+          const share = totalMembers > 0 ? Math.round((b.count / totalMembers) * 100) : 0;
           return (
-            <div key={b._id}>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
+            <div key={b._id} className="rounded-xl border border-gray-200 bg-white p-3.5">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                  <span className="text-sm font-medium text-gray-700 capitalize">{b._id}</span>
+                  <span className="text-sm font-semibold text-gray-800 capitalize truncate">{b._id}</span>
+                  <span className="text-[11px] text-gray-400">{share}% share</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="text-gray-400">{b.active} active</span>
-                  <span className="font-bold text-gray-800">{b.count} total</span>
+                <div className="flex items-center gap-2 text-xs shrink-0">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold">{b.active} active</span>
+                  <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 font-semibold">{b.count} total</span>
                 </div>
               </div>
               <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${pct}%`, background: color }}
+                  style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}cc)` }}
                 />
               </div>
-              <div className="mt-1 text-[10px] text-gray-400 text-right">{activePct}% active</div>
+              <div className="mt-1.5 text-[11px] text-gray-500 text-right">{activePct}% active in this plan</div>
             </div>
           );
         })}
@@ -295,7 +311,7 @@ function PlanPopularityChart({
 
       {/* Plan legend */}
       {plans.length > 0 && (
-        <div className="pt-3 border-t border-gray-100 grid grid-cols-1 gap-2">
+        <div className="pt-4 border-t border-gray-100 grid grid-cols-1 gap-2">
           {plans.map((p) => (
             <div key={p._id} className="flex items-center justify-between text-xs">
               <span className="text-gray-500 truncate">{p.name}</span>
