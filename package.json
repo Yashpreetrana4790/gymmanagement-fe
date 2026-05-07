@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "react-router dev",
-    "build": "react-router build",
-    "start": "react-router-serve ./build/server/index.js",
+    "dev": "node init && react-router dev",
+    "build": "node init && react-router build",
+    "start": "node init && react-router-serve ./build/server/index.js",
     "lint": "eslint .",
     "typecheck": "react-router typegen && tsc -b"
   },
